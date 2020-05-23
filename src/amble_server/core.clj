@@ -1,6 +1,9 @@
-(ns amble-server.core)
+(ns amble-server.core
+  (:require [compojure.core :refer :all]
+            [compojure.route :as route]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defroutes app
+           (POST "/game" [] "<h1>Hello World</h1>"))
+
+(defn -main [& args]
+  (println "helloooooo!!!!"))
