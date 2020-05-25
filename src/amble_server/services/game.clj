@@ -14,7 +14,7 @@
     (assoc-in response-raw
               [:headers
                "Access-Control-Allow-Origin"]
-              "http://localhost")))
+              "*")))
       
 
 (defn create [req]
