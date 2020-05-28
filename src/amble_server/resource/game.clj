@@ -1,7 +1,8 @@
-(ns amble-server.services.game
+(ns amble-server.resource.game
   (:require
     [ring.util.response :as response-util]
-    [compojure.response :as response]))
+    [compojure.response :as response]
+    [amble-server.depot.game :as game-depot]))
 
 
 (defn get-by-id [req]
@@ -19,8 +20,10 @@
         (response-util/status 200)
         (response-util/content-type "application/json"))))
 
+(defn momentary-game-name []
+  "default")
 
 (defn create [req]
-  (let [game-id "immaPretendGameId"]
+  (let [game-id (game-depot/create (momentary-game-name))]
     (response-util/status (response/render game-id req)
                           201)))

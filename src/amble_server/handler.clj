@@ -2,7 +2,7 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]] 
-            [amble-server.services.game :as game]))
+            [amble-server.resource.game :as game]))
 
 (defn middleware-custom [handler]
   (fn [req]
