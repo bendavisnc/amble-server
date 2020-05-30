@@ -16,26 +16,23 @@
 ;         (response-util/status 200)
 ;         (response-util/content-type "application/json"))))
 
-(def target-dir ".amble-gamedepot")
+(def target-dir "../.amble-gamedepot")
 
-(defn git [callback])
-
-;; Creates a new branch  with a name from the given game id.
+;; Creates a new branch with a name from the given game id.
 (defn create [game-id]
-  (let [output-sh 
-        (:out
-        ;  (shell/sh 
-                ;   "ls"))]
-                ;   "pwd"))]
-                ;    (str "mkdir " target-dir)))]
-                ;   (str "mkdir " target-dir ";\n" "cd " target-dir "; git status")))]
-                ;    "cd " target-dir))]
-         (shell/sh "git" "status" :dir target-dir))]
+  (let [branch-create
+        (shell/sh "git" "checkout" "-b" game-id :dir target-dir)
+        branch-checkout-prior
+        (shell/sh "git" "checkout" "-" :dir target-dir)]
+    (println (:err branch-create))
+    (println (str "Switched to a new branch '" game-id "'"))
+    (assert (= branch-create
+               {:exit 0, :out "", :err (str "Switched to a new branch '" game-id "'/n")}))
+    (assert (= branch-checkout-prior)
+           {:exit 0, :out "", :err "Switched to branch 'amble-game-base'"})
+    (:out branch-create)))
 
-    (println "neat...")
-    (println output-sh)
-    output-sh))
- 
-  
- 
- 
+
+
+
+

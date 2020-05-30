@@ -2,7 +2,8 @@
   (:require
     [ring.util.response :as response-util]
     [compojure.response :as response]
-    [amble-server.depot.game :as game-depot]))
+    [amble-server.depot.game :as game-depot])
+  (:import (java.util Calendar Locale)))
 
 
 (defn get-by-id [req]
@@ -20,8 +21,17 @@
         (response-util/status 200)
         (response-util/content-type "application/json"))))
 
+(defn day-of-week []
+  (.getDisplayName (Calendar/getInstance)
+                   Calendar/DAY_OF_WEEK
+                   Calendar/LONG
+                   (Locale/getDefault)))
+
 (defn momentary-game-name []
-  "default")
+  (str
+      "The"
+      (day-of-week)
+      "Game"))
 
 (defn create [req]
   (let [game-id (game-depot/create (momentary-game-name))]
