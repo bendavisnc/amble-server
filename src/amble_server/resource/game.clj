@@ -16,10 +16,16 @@
 
 (defn get-by-tag [req]
   (println "Sending get game by tag response.")
-  (let [games-found ["immaPretendGameBranchName"]]
-    (-> (response/render (str games-found) req)
-        (response-util/status 200)
-        (response-util/content-type "application/json"))))
+  (let [tag (:tag (:params req))
+        found (game-depot/find-by-tag tag)]
+    (cond (not found)
+          (response-util/status req
+                                404)
+          :default
+          (do
+            (println found)
+            (response-util/status (response/render found req)
+                                  200)))))
 
 (defn day-of-week []
   (.getDisplayName (Calendar/getInstance)

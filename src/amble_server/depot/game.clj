@@ -1,5 +1,6 @@
 (ns amble-server.depot.game
-  (:require [clojure.java.shell :as shell]))
+  (:require [clojure.java.shell :as shell])
+  (:import (java.util.regex Pattern)))
 
 (def target-dir "../.amble-gamedepot")
 
@@ -7,8 +8,19 @@
   nil)
 
 
-(defn find-by-tag []
-  nil)
+(defn find-by-tag [tag]
+  (let [branch-list
+        (shell/sh "git" "branch" "-l" :dir target-dir)
+        branches
+        (clojure.string/split (:out branch-list)
+                              (Pattern/compile "\\s"))]
+    (cond (some (fn [branch-name]
+                  (= tag branch-name))
+                branches)
+          (shell/sh "git" "show" "--oneline" tag :dir target-dir)
+          :default
+          nil)))
+
 
 
 (defn create
