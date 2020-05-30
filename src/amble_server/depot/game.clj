@@ -13,14 +13,20 @@
         (shell/sh "git" "branch" "-l" :dir target-dir)
         branches
         (clojure.string/split (:out branch-list)
-                              (Pattern/compile "\\s"))]
-    (cond (some (fn [branch-name]
+                              (Pattern/compile "\\s"))
+        branch
+        (filter
+                (fn [branch-name]
                   (= tag branch-name))
                 branches)
-          (shell/sh "git" "show" "--oneline" tag :dir target-dir)
-          :default
-          nil)))
-
+        commit-id
+        (map (fn [branch-name]
+               (-> (shell/sh "git" "show" "--oneline" branch-name :dir target-dir)
+                   :out
+                   (clojure.string/split (Pattern/compile "\\s"))
+                   first))
+             branch)]
+    (first commit-id)))
 
 
 (defn create
