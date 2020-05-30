@@ -29,7 +29,7 @@
     (first commit-id)))
 
 
-(defn create
+(defn create!
   "Creates a new branch with a name from the given game id."
   [game-id]
   (let [branch-create

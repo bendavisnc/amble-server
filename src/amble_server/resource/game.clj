@@ -14,18 +14,9 @@
         (response-util/content-type "application/json"))))
 
 
-(defn get-by-tag [req]
-  (println "Sending get game by tag response.")
-  (let [tag (:tag (:params req))
-        found (game-depot/find-by-tag tag)]
-    (cond (not found)
-          (response-util/status req
-                                404)
-          :default
-          (do
-            (println found)
-            (response-util/status (response/render found req)
-                                  200)))))
+(defn get-by-tag [tag]
+  (game-depot/find-by-tag tag))
+
 
 (defn day-of-week []
   (.getDisplayName (Calendar/getInstance)
@@ -39,7 +30,6 @@
       (day-of-week)
       "Game"))
 
-(defn create [req]
-  (let [game-id (game-depot/create (momentary-game-name))]
-    (response-util/status (response/render game-id req)
-                          201)))
+(defn create! [game-id]
+  (game-depot/create! game-id))
+
