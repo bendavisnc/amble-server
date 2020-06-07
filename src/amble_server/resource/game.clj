@@ -5,31 +5,19 @@
     [amble-server.depot.game :as game-depot])
   (:import (java.util Calendar Locale)))
 
+(defn get-by-id [id]
+  (println (str "Getting game resource by id (" id ")."))
+  (game-depot/find id))
 
-(defn get-by-id [req]
-  (println "Sending get game by id response.")
-  (let [game-id "fortyTwo"]
-    (-> (response/render game-id req)
-        (response-util/status 200)
-        (response-util/content-type "application/json"))))
-
-
-(defn get-by-tag [tag]
-  (game-depot/find-by-tag tag))
-
-
-(defn day-of-week []
-  (.getDisplayName (Calendar/getInstance)
-                   Calendar/DAY_OF_WEEK
-                   Calendar/LONG
-                   (Locale/getDefault)))
-
-(defn momentary-game-name []
-  (str
-      "The"
-      (day-of-week)
-      "Game"))
+;(defn search
+;  [params]
+;  (game-depot/find (:alias params)))
 
 (defn create! [game-id]
+  (println "Creating new game resource for id.")
   (game-depot/create! game-id))
+
+(defn delete! [game-id]
+  (println "Getting game resource by id.")
+  (game-depot/delete! game-id))
 

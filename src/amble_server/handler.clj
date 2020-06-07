@@ -17,9 +17,9 @@
                  "Access-Control-Allow-Origin"]
                 "*"))))
 
-(defn game-get-by-tag [req]
-  (let [tag (:tag (:params req))
-        found (game/get-by-tag tag)]
+(defn game-get-by-id [req]
+  (let [game-id (:game-id (:params req))
+        found (game/get-by-id game-id)]
     (cond (not found)
           (response-util/status req
                                 404)
@@ -27,9 +27,19 @@
           (response-util/response
             {:game-id found}))))
 
+;(defn game-get-by-tag [req]
+;  (let [tag (:tag (:params req))
+;        found (game/get-by-tag tag)]
+;    (cond (not found)
+;          (response-util/status req
+;                                404)
+;          :default
+;          (response-util/response
+;            {:game-id found}))))
+
 (defn game-create! [_]
   (let [game-id (utils/momentary-game-name)
-        already-existing-game-id (game/get-by-tag game-id)]
+        already-existing-game-id (game/get-by-id game-id)]
     (if (not (nil? already-existing-game-id))
       (-> (response-util/response "Conflict.")
           (response-util/status 409))
@@ -42,11 +52,18 @@
         (-> (response-util/response {:game-id game-id})
             (response-util/status 201))))))
 
+(defn game-delete! [req]
+  (let [game-id (:game-id (:params req))]
+    (let [
+          game-id (game/delete! game-id)]
+      (-> (response-util/response {:game-id game-id})
+          (response-util/status 200)))))
+
 (defroutes app-routes
            (GET "/" [] "Hello World")
-           (GET "/game/:game-id" [] game/get-by-id)
-           (GET "/game" [] game-get-by-tag)
+           (GET "/game/:game-id" [] game-get-by-id)
            (POST "/game" [] game-create!)
+           (DELETE "/game/:game-id" [] game-delete!)
            (route/not-found "Not Found"))
 
 (def app (middleware-json/wrap-json-response

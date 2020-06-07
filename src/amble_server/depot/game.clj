@@ -4,11 +4,8 @@
 
 (def target-dir "../.amble-gamedepot")
 
-(defn find-by-id []
-  nil)
-
-
-(defn find-by-tag [tag]
+(defn find [branch-name]
+  "Returns nil or a string for the commit corresponding to the found branch."
   (let [branch-list
         (shell/sh "git" "branch" "-l" :dir target-dir)
         branches
@@ -16,11 +13,12 @@
                               (Pattern/compile "\\s"))
         branch
         (filter
-                (fn [branch-name]
-                  (= tag branch-name))
+                (fn [branch-name-listed]
+                  (= branch-name-listed branch-name))
                 branches)
         commit-id
-        (map (fn [branch-name]
+        (map (fn [branch-name-samey]
+               (assert (= branch-name branch-name-samey))
                (-> (shell/sh "git" "show" "--oneline" branch-name :dir target-dir)
                    :out
                    (clojure.string/split (Pattern/compile "\\s"))
@@ -40,4 +38,14 @@
                {:exit 0, :out "", :err (str "Switched to a new branch '" game-id "'\n")}))
     (assert (= branch-checkout-prior)
             {:exit 0, :out "", :err "Switched to branch 'amble-game-base'\n"})
+    game-id))
+
+(defn delete!
+  "Deletes the branch with the given game id."
+  [game-id]
+  (let [branch-delete
+        (shell/sh "git" "branch" "-d" game-id :dir target-dir)]
+    (assert (clojure.string/includes? (:out branch-delete)
+                                      (str "Deleted branch " game-id)))
+    (println branch-delete)
     game-id))
