@@ -14,7 +14,9 @@
 ;  (game-depot/find (:alias params)))
 
 (defn create! [game-id]
-  (println "Creating new game resource for id.")
+  (println (str "Creating new game resource for id, "
+                game-id
+                "."))
   (game-depot/create! game-id))
 
 (defn delete! [game-id]

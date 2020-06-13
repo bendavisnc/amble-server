@@ -37,8 +37,15 @@
 ;          (response-util/response
 ;            {:game-id found}))))
 
-(defn game-create! [_]
-  (let [game-id (utils/momentary-game-name)
+(defn game-create! [req]
+  (println req)
+  (let [game-id-prefix ((:headers req)
+                        (name :x-amble-game-id-prefix))
+        _ (when game-id-prefix
+            (println (str "Using game id prefix value, \""
+                          game-id-prefix
+                          "\".")))
+        game-id (str game-id-prefix (utils/momentary-game-name))
         already-existing-game-id (game/get-by-id game-id)]
     (if (not (nil? already-existing-game-id))
       (-> (response-util/response "Conflict.")
@@ -61,6 +68,7 @@
 
 (defroutes app-routes
            (GET "/" [] "Hello World")
+           (GET "/game-id" [] (utils/momentary-game-name))
            (GET "/game/:game-id" [] game-get-by-id)
            (POST "/game" [] game-create!)
            (DELETE "/game/:game-id" [] game-delete!)
@@ -68,14 +76,11 @@
 
 (def app (middleware-json/wrap-json-response
            (middleware-custom
-              (middleware-default/wrap-defaults app-routes
-                                                  (assoc-in middleware-default/api-defaults
-                                                              [:responses, :content-types]
-                                                              false)))
+             (middleware-default/wrap-defaults app-routes
+                                               (assoc-in middleware-default/api-defaults
+                                                         [:responses, :content-types]
+                                                         false)))
 
 
            {:pretty-print true}))
-
-
-
 

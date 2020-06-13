@@ -7,7 +7,8 @@
                  [ring/ring-defaults "0.3.2"]
                  [ring/ring-json "0.5.0"]]
 
-  :plugins [[lein-ring "0.12.5"]]
+  :plugins [[lein-ring "0.12.5"]
+            [lein-auto "0.1.3"]]
   :ring {:handler amble-server.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

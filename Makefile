@@ -1,7 +1,7 @@
-rundevserver: creategamedepotdir
+rundevserver: creategamedepot
 	lein ring server-headless
 
-creategamedepotdir: clean
+creategamedepot: clean
 	mkdir ../.amble-gamedepot
 	cd ../.amble-gamedepot; \
 	git init; \
@@ -12,3 +12,7 @@ creategamedepotdir: clean
 
 clean:
 	rm -R -d -f ../.amble-gamedepot
+
+runtests:
+	echo 'Running amble server tests'; \
+	lein auto test;
