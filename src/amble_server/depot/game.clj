@@ -47,5 +47,4 @@
         (shell/sh "git" "branch" "-d" game-id :dir target-dir)]
     (assert (clojure.string/includes? (:out branch-delete)
                                       (str "Deleted branch " game-id)))
-    (println branch-delete)
     game-id))

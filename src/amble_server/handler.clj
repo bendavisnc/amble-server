@@ -38,7 +38,6 @@
 ;            {:game-id found}))))
 
 (defn game-create! [req]
-  (println req)
   (let [game-id-prefix ((:headers req)
                         (name :x-amble-game-id-prefix))
         _ (when game-id-prefix

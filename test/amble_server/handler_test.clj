@@ -1,7 +1,9 @@
 (ns amble-server.handler-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock-request]
-            [amble-server.handler :refer :all]))
+            [amble-server.handler :refer :all]
+            [clojure.edn :as edn]
+            [clojure.data.json :as json]))
 
 (def test-game-prefix "test-")
 
@@ -17,13 +19,19 @@
                                   (mock-request/header :x-amble-game-id-prefix test-game-prefix))
           create-game-response (app create-game-request)]
       (is (= 201
-             (:status create-game-response)))))
+             (:status create-game-response)))
+      (is (= {"game-id" (str test-game-prefix game-id)}
+             (json/read-str (:body create-game-response))))))
+
   (testing "game get"
     (let [game-id (:body (app (mock-request/request :get "/game-id")))
-          get-game-request (-> (mock-request/request :get 
+          get-game-request (-> (mock-request/request :get
                                                      (str "/game/"
                                                           test-game-prefix
                                                           game-id)))
           get-game-response (app get-game-request)]
       (is (= 200
-             (:status get-game-response))))))
+             (:status get-game-response)))
+      (is (= {"game-id" (str test-game-prefix game-id)}
+             (json/read-str (:body get-game-response)))))))
+

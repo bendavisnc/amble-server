@@ -5,7 +5,9 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
-                 [ring/ring-json "0.5.0"]]
+                 [ring/ring-json "0.5.0"]
+                 [org.clojure/data.json "1.0.0"]]
+
 
   :plugins [[lein-ring "0.12.5"]
             [lein-auto "0.1.3"]]
