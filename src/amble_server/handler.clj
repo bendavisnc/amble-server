@@ -60,11 +60,16 @@
             (response-util/status 201))))))
 
 (defn game-delete! [req]
-  (let [game-id (:game-id (:params req))]
-    (let [
-          game-id (game/delete! game-id)]
-      (-> (response-util/response {:game-id game-id})
-          (response-util/status 200)))))
+  (let [game-id (:game-id (:params req))
+        already-existing-game-id (game/get-by-id game-id)]
+    (cond (not already-existing-game-id)
+          (-> (response-util/response {:game-id game-id})
+              (response-util/status 200))
+          :else
+          (let [
+                game-id (game/delete! game-id)]
+            (-> (response-util/response {:game-id game-id})
+                (response-util/status 200))))))
 
 (defroutes app-routes
            (GET "/" [] "Hello World")

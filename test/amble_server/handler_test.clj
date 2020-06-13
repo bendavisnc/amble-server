@@ -17,11 +17,13 @@
                                   (mock-request/header :x-amble-game-id-prefix test-game-prefix))
           create-game-response (app create-game-request)]
       (is (= 201
-             (:status create-game-response))) ;; Create game works.
-      (let [id-game-created (:body create-game-response)
-            get-game-response (app (mock-request/request :get
-                                                         (str "/game"
-                                                              id-game-created)))]
-        (println "banana")
-        (println id-game-created)
-        (is (= (:status get-game-response) 200))))))
+             (:status create-game-response)))))
+  (testing "game get"
+    (let [game-id (:body (app (mock-request/request :get "/game-id")))
+          get-game-request (-> (mock-request/request :get 
+                                                     (str "/game/"
+                                                          test-game-prefix
+                                                          game-id)))
+          get-game-response (app get-game-request)]
+      (is (= 200
+             (:status get-game-response))))))
