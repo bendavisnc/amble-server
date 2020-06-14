@@ -19,13 +19,12 @@
 
 (defn game-get-by-id [req]
   (let [game-id (:game-id (:params req))
-        found (game/get-by-id game-id)]
+        found (game/get game-id)]
     (cond (not found)
           (response-util/status req
                                 404)
           :default
-          (response-util/response
-            {:game-id found}))))
+          (response-util/response found))))
 
 ;(defn game-get-by-tag [req]
 ;  (let [tag (:tag (:params req))
@@ -45,7 +44,7 @@
                           game-id-prefix
                           "\".")))
         game-id (str game-id-prefix (utils/momentary-game-name))
-        already-existing-game-id (game/get-by-id game-id)]
+        already-existing-game-id (game/get game-id)]
     (if (not (nil? already-existing-game-id))
       (-> (response-util/response "Conflict.")
           (response-util/status 409))
@@ -60,7 +59,7 @@
 
 (defn game-delete! [req]
   (let [game-id (:game-id (:params req))
-        already-existing-game-id (game/get-by-id game-id)]
+        already-existing-game-id (game/get game-id)]
     (cond (not already-existing-game-id)
           (-> (response-util/response {:game-id game-id})
               (response-util/status 200))

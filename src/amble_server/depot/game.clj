@@ -4,8 +4,7 @@
 
 (def target-dir "../.amble-gamedepot")
 
-(defn find [branch-name]
-  "Returns nil or a string for the commit corresponding to the found branch."
+(defn find [game-id]
   (let [branch-list
         (shell/sh "git" "branch" "-l" :dir target-dir)
         branches
@@ -14,17 +13,12 @@
         branch
         (filter
                 (fn [branch-name-listed]
-                  (= branch-name-listed branch-name))
-                branches)
-        commit-id
-        (map (fn [branch-name-samey]
-               (assert (= branch-name branch-name-samey))
-               (-> (shell/sh "git" "show" "--oneline" branch-name :dir target-dir)
-                   :out
-                   (clojure.string/split (Pattern/compile "\\s"))
-                   first))
-             branch)]
-    (first commit-id)))
+                  (= branch-name-listed game-id))
+                branches)]
+    (and (first branch)
+         (slurp (str target-dir
+                     "/"
+                     "game-base.json")))))
 
 
 (defn create!

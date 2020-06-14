@@ -8,7 +8,7 @@
 (def test-game-prefix "test-")
 
 (deftest test-amble-server-api
-  (testing "game create"
+  (testing "create game"
     (let [game-id (:body (app (mock-request/request :get "/game-id")))
           _ (app (mock-request/request :delete
                                        (str "/game/"
@@ -23,7 +23,7 @@
       (is (= {"game-id" (str test-game-prefix game-id)}
              (json/read-str (:body create-game-response))))))
 
-  (testing "game get"
+  (testing "get game"
     (let [game-id (:body (app (mock-request/request :get "/game-id")))
           get-game-request (-> (mock-request/request :get
                                                      (str "/game/"
@@ -32,6 +32,6 @@
           get-game-response (app get-game-request)]
       (is (= 200
              (:status get-game-response)))
-      (is (= {"game-id" (str test-game-prefix game-id)}
+      (is (= [[1 2] [3 4]]
              (json/read-str (:body get-game-response)))))))
 
