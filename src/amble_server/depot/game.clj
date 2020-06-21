@@ -1,5 +1,6 @@
 (ns amble-server.depot.game
-  (:require [clojure.java.shell :as shell])
+  (:require [clojure.java.shell :as shell]
+            [clojure.edn :as edn])
   (:import (java.util.regex Pattern)))
 
 (def target-dir "../.amble-gamedepot")
@@ -16,9 +17,9 @@
                   (= branch-name-listed game-id))
                 branches)]
     (and (first branch)
-         (slurp (str target-dir
-                     "/"
-                     "game-base.json")))))
+         (edn/read-string (slurp (str target-dir
+                                      "/"
+                                      "game-base.json"))))))
 
 
 (defn create!
