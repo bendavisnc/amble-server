@@ -3,10 +3,8 @@
             [compojure.route :as route]
             [ring.middleware.defaults :as middleware-default]
             [ring.middleware.json :as middleware-json]
-            [ring.util.response :as response-util]
-            [compojure.response :as response]
-            [amble-server.resource.game :as game]
-            [amble-server.utils :as utils]))
+            [amble-server.utils :as utils]
+            [amble-server.api.game :as game-api]))
 
 (defn middleware-custom [handler]
   (fn [req]
@@ -17,64 +15,13 @@
                  "Access-Control-Allow-Origin"]
                 "*"))))
 
-(defn game-get-by-id [req]
-  (let [game-id (:game-id (:params req))
-        found (game/get game-id)]
-    (cond (not found)
-          (response-util/status req
-                                404)
-          :default
-          (response-util/response found))))
-
-;(defn game-get-by-tag [req]
-;  (let [tag (:tag (:params req))
-;        found (game/get-by-tag tag)]
-;    (cond (not found)
-;          (response-util/status req
-;                                404)
-;          :default
-;          (response-util/response
-;            {:game-id found}))))
-
-(defn game-create! [req]
-  (let [game-id-prefix ((:headers req)
-                        (name :x-amble-game-id-prefix))
-        _ (when game-id-prefix
-            (println (str "Using game id prefix value, \""
-                          game-id-prefix
-                          "\".")))
-        game-id (str game-id-prefix (utils/momentary-game-name))
-        already-existing-game-id (game/get game-id)]
-    (if (not (nil? already-existing-game-id))
-      (-> (response-util/response "Conflict.")
-          (response-util/status 409))
-      ;else
-      (let [
-            game-id (game/create! game-id)]
-        (assert (= (type "")
-                   (type game-id))
-                "Expected game id to be a string.")
-        (-> (response-util/response {:game-id game-id})
-            (response-util/status 201))))))
-
-(defn game-delete! [req]
-  (let [game-id (:game-id (:params req))
-        already-existing-game-id (game/get game-id)]
-    (cond (not already-existing-game-id)
-          (-> (response-util/response {:game-id game-id})
-              (response-util/status 200))
-          :else
-          (let [
-                game-id (game/delete! game-id)]
-            (-> (response-util/response {:game-id game-id})
-                (response-util/status 200))))))
 
 (defroutes app-routes
            (GET "/" [] "Hello World")
            (GET "/game-id" [] (utils/momentary-game-name))
-           (GET "/game/:game-id" [] game-get-by-id)
-           (POST "/game" [] game-create!)
-           (DELETE "/game/:game-id" [] game-delete!)
+           (GET "/game/:game-id" [] game-api/get)
+           (POST "/game" [] game-api/add!)
+           (DELETE "/game/:game-id" [] game-api/delete!)
            (route/not-found "Not Found"))
 
 (def app (middleware-json/wrap-json-response
