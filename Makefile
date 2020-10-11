@@ -1,17 +1,13 @@
-rundevserver: creategamedepot
+rundevserver: initdb
 	lein ring server-headless
 
-creategamedepot: clean
-	mkdir ../.amble-gamedepot
-	cd ../.amble-gamedepot; \
-	git init; \
-	git checkout -b "amble-game-base"; \
-	cp ../amble-server/resources/amble-gamedepot/game-base.json . ;\
-	git add .; \
-	git commit -m "Adds starting game."
+initdb: clean
+	mkdir ../.amble-db
+	cd ../.amble-db; \
+	sqlite3 amble.db < ../amble-server/migrations/initfreshdb.sql
 
 clean:
-	rm -R -d -f ../.amble-gamedepot
+	rm -R -d -f ../.amble-db
 
 runtests:
 	echo 'Running amble server tests'; \

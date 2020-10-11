@@ -1,0 +1,19 @@
+BEGIN TRANSACTION;
+CREATE TABLE IF NOT EXISTS "Move" (
+	"id"	INTEGER,
+	"game"	INTEGER,
+	FOREIGN KEY("game") REFERENCES "Game"("id")
+);
+CREATE TABLE IF NOT EXISTS "Game" (
+	"id"	INTEGER,
+	"name"	TEXT,
+	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "Player" (
+	"id"	INTEGER,
+	"name"	INTEGER,
+	"game"	INTEGER,
+	PRIMARY KEY("id"),
+	FOREIGN KEY("game") REFERENCES "Game"("id")
+);
+COMMIT;

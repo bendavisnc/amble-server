@@ -1,9 +1,9 @@
-(ns amble-server.depot.game
+(ns amble-server.db.game
   (:require [clojure.java.shell :as shell]
             [clojure.edn :as edn])
   (:import (java.util.regex Pattern)))
 
-(def target-dir "../.amble-gamedepot")
+(def target-dir "../.amble-db")
 
 (defn find [game-id]
   (let [branch-list
