@@ -4,7 +4,8 @@
             [ring.middleware.defaults :as middleware-default]
             [ring.middleware.json :as middleware-json]
             [amble-server.utils :as utils]
-            [amble-server.api.game :as game-api]))
+            [amble-server.api.game :as game-api]
+            [amble-server.api.board :as board-api]))
 
 (defn middleware-custom [handler]
   (fn [req]
@@ -20,6 +21,7 @@
            (GET "/" [] "Hello World")
            (GET "/game-id" [] (utils/momentary-game-name))
            (GET "/game/:game-id" [] game-api/get)
+           (GET "/game/:game-id/board" [] board-api/get)
            (POST "/game" [] game-api/add!)
            (DELETE "/game/:game-id" [] game-api/delete!)
            (route/not-found "Not Found"))
