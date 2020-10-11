@@ -7,34 +7,43 @@
 
 
 (defn add! [req]
-  (let [game-id-prefix ((:headers req)
-                        (name :x-amble-game-id-prefix))
-        _ (when game-id-prefix
-            (println (str "Using game id prefix value, \""
-                          game-id-prefix
-                          "\".")))
-        game-id (str game-id-prefix (utils/momentary-game-name))
-        already-existing-game-id (game-resource/get game-id)]
-    (if (not (nil? already-existing-game-id))
-      (-> (response-util/response "Conflict.")
-          (response-util/status 409))
-      ;else
-      (let [
-            game-id (game-resource/create! game-id)]
-        (assert (= (type "")
-                   (type game-id))
-                "Expected game id to be a string.")
-        (-> (response-util/response {:game-id game-id})
-            (response-util/status 201))))))
+  (try
+    (let [game-id-prefix ((:headers req)
+                          (name :x-amble-game-id-prefix))
+          _ (when game-id-prefix
+              (println (str "Using game id prefix value, \""
+                            game-id-prefix
+                            "\".")))
+          game-id (str game-id-prefix (utils/momentary-game-name))
+          already-existing-game-id (game-resource/get game-id)]
+      (if (not (nil? already-existing-game-id))
+        (-> (response-util/response "Conflict.")
+            (response-util/status 409))
+        ;else
+        (let [
+              game-id (game-resource/create! game-id)]
+          (assert (= (type "")
+                     (type game-id))
+                  "Expected game id to be a string.")
+          (-> (response-util/response {:game-id game-id})
+              (response-util/status 201)))))
+    (catch Throwable e
+      (println "An error occurred during game create.")
+      (println e)
+      (response-util/status req 500))))
 
 (defn get [req]
   (let [game-id (:game-id (:params req))
         found (game-resource/get game-id)]
-    (cond (not found)
-          (response-util/status req
-                                404)
-          :default
-          (response-util/response found))))
+    (try
+      (cond (not found)
+            (response-util/status req 404)
+            :default
+            (response-util/response found))
+      (catch Throwable e
+        (println "An error occurred during game get.")
+        (println e)
+        (response-util/status req 500)))))
 
 
 (defn delete! [req]
