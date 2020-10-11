@@ -21,10 +21,10 @@
             (response-util/status 409))
         ;else
         (let [
-              game-id (game-resource/create! game-id)]
-          (assert (= (type "")
-                     (type game-id))
-                  "Expected game id to be a string.")
+              was-game-created (game-resource/create! game-id)]
+          (assert (= 1
+                     was-game-created)
+                  "Expected the number one.")
           (-> (response-util/response {:game-id game-id})
               (response-util/status 201)))))
     (catch Throwable e

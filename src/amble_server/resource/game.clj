@@ -6,10 +6,7 @@
 
 (defn get [id]
   (inform "Getting" id)
-  (let [found (game-db/find id)]
-    (if (empty? found)
-      nil
-      (first found))))
+  (game-db/find id))
 
 (defn create! [id]
   (inform "Creating", id)

@@ -12,14 +12,19 @@
    :subname     target-db})
 
 (defn find [id]
-  (let [huh
+  (let [found
         (jdbc/query db ["select * from game where id = ?" id])]
-    (println huh)
-    huh))
+    (first (map :id found))))
 
 (defn create!
   [id]
-  (jdbc/insert! db :game {:id id}))
+  (let [write
+        (jdbc/insert! db :game {:id id})]
+    (first (map (fn [w]
+                  (let [k (first (keys w))]
+                    (k w)))
+                write))))
+
 
 (defn delete!
   "Deletes the branch with the given game id."
