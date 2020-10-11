@@ -1,13 +1,13 @@
 (ns amble-server.resource.game
   (:require
-    [amble-server.depot.game :as game-depot]))
+    [amble-server.db.game :as game-db]))
 
 (declare inform)
 
 (defn get [id]
   (inform "Getting" id)
   (let [
-        designatee-coords (game-depot/find id)
+        designatee-coords (game-db/find id)
         piece-indexes
                       [[111 112 113 114 115 116 117 118 119 120]
                        [65 74 76 84 86 88 95 97 99 101]
@@ -22,17 +22,13 @@
       {:designatee-coords designatee-coords
        :piece-indexes piece-indexes})))
 
-;(defn search
-;  [params]
-;  (game-depot/find (:alias params)))
-
 (defn create! [id]
   (inform "Creating", id)
-  (game-depot/create! id))
+  (game-db/create! id))
 
 (defn delete! [id]
   (inform "Deleting", id)
-  (game-depot/delete! id))
+  (game-db/delete! id))
 
 (defn inform [about, id]
   (println (str about
