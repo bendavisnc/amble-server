@@ -1,24 +1,18 @@
-(ns amble-server.db.game
+(ns amble-server.db.player
   (:require
     [clojure.java.jdbc :as jdbc]
     [amble-server.db.core :as db]))
 
-(defn find [id]
+(defn find [game-id, id]
   (let [found
-        (jdbc/query db/db ["select * from game where id = ?" id])]
+        (jdbc/query db/db ["select * from player where gameId = ? and id = ?" game-id id])]
     (first (map :id found))))
 
-(defn create!
-  [id]
+(defn add!
+  [game-id, id]
   (let [write
-        (jdbc/insert! db/db :game {:id id})]
+        (jdbc/insert! db/db :player {:id id, :gameId game-id})]
     (first (map (fn [w]
                   (let [k (first (keys w))]
                     (k w)))
                 write))))
-
-
-(defn delete!
-  "Deletes the branch with the given game id."
-  [game-id]
-  nil)

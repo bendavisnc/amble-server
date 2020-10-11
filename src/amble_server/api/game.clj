@@ -1,6 +1,7 @@
 (ns amble-server.api.game
   (:require
     [amble-server.resource.game :as game-resource]
+    [amble-server.resource.player :as player-resource]
     [ring.util.response :as response-util]
     [amble-server.utils :as utils]))
 
@@ -21,10 +22,18 @@
             (response-util/status 409))
         ;else
         (let [
-              was-game-created (game-resource/create! game-id)]
-          (assert (= 1
-                     was-game-created)
-                  "Expected the number one.")
+              was-game-created (game-resource/create! game-id)
+              players-created (doall (map (fn [i]
+                                            (player-resource/add! game-id (str "player-"
+                                                                               (nth ["one", "two", "three", "four", "five", "six"]
+                                                                                    i))))
+                                          (range 6)))
+              _ (doall (map (fn [write-result]
+                              (assert (pos-int? write-result)
+                                      "Unexpected db result while adding game."))
+                            (conj players-created was-game-created)))]
+
+
           (-> (response-util/response {:game-id game-id})
               (response-util/status 201)))))
     (catch Throwable e
