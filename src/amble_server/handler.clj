@@ -5,6 +5,7 @@
             [ring.middleware.json :as middleware-json]
             [amble-server.utils :as utils]
             [amble-server.api.game :as game-api]
+            [amble-server.api.player :as player-api]
             [amble-server.api.board :as board-api]))
 
 (defn middleware-custom [handler]
