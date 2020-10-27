@@ -13,7 +13,7 @@
 (defn get [game-id, id]
   (println (str "Getting player, " id ", on game, \"" game-id "\"."))
   (let [somethingToRevisit (player-db/find game-id id)]
-    (println "unsure")
-    (println somethingToRevisit)
+    ;(println "unsure")
+    ;(println somethingToRevisit)
     somethingToRevisit))
 

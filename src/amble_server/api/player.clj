@@ -26,23 +26,31 @@
   (println req)
   (let [game-id (:game-id (:params req))
         id (:player-id (:params req))
-        game-found-seq (lazy-seq (game-resource/get game-id))
-        player-found-seq (lazy-cat (for [_ game-found-seq]
-                                     (player-resource/get game-id id)))]
+        f (game-resource/get game-id)
+        g (lazy-seq f)
+        game-found-seq (vec g)
+        _ (assert (= 1 (count game-found-seq)))
+        player-found-seq (vec (lazy-cat (for [_ game-found-seq]
+                                          (player-resource/get game-id id))))]
+    (println "wellllllllllllll")
+    (doall player-found-seq)
+    (println "cooooool?")
     (println player-found-seq)
+    (println "no?")
+    (println game-found-seq)
     player-found-seq))
 
 
-(println "wut"
-    (println [game-id, id])
-    (try
-      (cond (not game-found)
-            (response-util/status req 404)
-            :default
-            (response-util/response
-              (player-resource/get game-id id)))
-      (catch Throwable e
-        (println "An error occurred during game board get.")
-        (println e)
-        (response-util/status req 500))))
-
+;(println "wut"
+;    (println [game-id, id])
+;    (try
+;      (cond (not game-found)
+;            (response-util/status req 404)
+;            :default
+;            (response-util/response
+;              (player-resource/get game-id id)))
+;      (catch Throwable e
+;        (println "An error occurred during game board get.")
+;        (println e)
+;        (response-util/status req 500))))
+;
