@@ -10,3 +10,10 @@
   (println (str "Getting all players for game, \""  game-id "\"."))
   (player-db/find game-id))
 
+(defn get [game-id, id]
+  (println (str "Getting player, " id ", on game, \"" game-id "\"."))
+  (let [somethingToRevisit (player-db/find game-id id)]
+    (println "unsure")
+    (println somethingToRevisit)
+    somethingToRevisit))
+

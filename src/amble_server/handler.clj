@@ -24,6 +24,7 @@
            (GET "/game/:game-id" [] game-api/get)
            (GET "/game/:game-id/board" [] board-api/get)
            (GET "/game/:game-id/player" [] player-api/get-all)
+           (GET "/game/:game-id/player/:player-id" [] player-api/get)
            (POST "/game" [] game-api/add!)
            (DELETE "/game/:game-id" [] game-api/delete!)
            (route/not-found "Not Found"))

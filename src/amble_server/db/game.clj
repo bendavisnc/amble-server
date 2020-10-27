@@ -8,6 +8,7 @@
         (jdbc/query db/db ["select * from game where id = ?" id])]
     (first (map :id found))))
 
+
 (defn create!
   [id]
   (let [write
