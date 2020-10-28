@@ -21,24 +21,39 @@
         (println e)
         (response-util/status req 500)))))
 
+
+(defn crude-player-indexes-map [player-id]
+  (let [ordered
+        [:player-one, :player-two, :player-three, :player-four, :player-five, :player-six]
+        id-index (.indexOf ordered (keyword player-id))
+        _ (assert (not (neg-int? id-index)))
+        index-list
+        [[111 112 113 114 115 116 117 118 119 120]
+         [65 74 76 84 86 88 95 97 99 101]
+         [10 11 12 13 20 22 24 33 35 45]
+         [0 1 2 3 4 5 6 7 8 9]
+         [19 21 23 25 32 34 36 44 46 55]
+         [75 85 87 96 98 100 107 108 109 110]]
+        player-coord-indexes (index-list id-index)
+        boord-coords
+        (edn/read-string (slurp (io/resource "board.json")))
+        player-coords (vec (map (fn [i]
+                                  (nth boord-coords i))
+                                player-coord-indexes))]
+    player-coords))
+
 (defn get [req]
-  (println "i'm confused")
-  (println req)
   (let [game-id (:game-id (:params req))
         id (:player-id (:params req))
-        f (game-resource/get game-id)
-        g (lazy-seq f)
-        game-found-seq (vec g)
+        game-found-seq (lazy-seq (cons (game-resource/get game-id) nil))
         _ (assert (= 1 (count game-found-seq)))
-        player-found-seq (vec (lazy-cat (for [_ game-found-seq]
-                                          (player-resource/get game-id id))))]
-    (println "wellllllllllllll")
-    (doall player-found-seq)
-    (println "cooooool?")
-    (println player-found-seq)
-    (println "no?")
-    (println game-found-seq)
-    player-found-seq))
+        player-found-seq (lazy-cat (for [_ game-found-seq]
+                                     (player-resource/get game-id id)))
+        id-from-db (first player-found-seq)
+        _ (assert (= id id-from-db))]
+
+    (response-util/response
+      (crude-player-indexes-map id))))
 
 
 ;(println "wut"
