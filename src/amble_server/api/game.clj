@@ -7,7 +7,11 @@
 
 
 
-(defn add! [req]
+(defn add!
+  "Adds a new game.
+   Returns a new game id.
+   Currently automatically creates six players."
+  [req]
   (try
     (let [game-id-prefix ((:headers req)
                           (name :x-amble-game-id-prefix))

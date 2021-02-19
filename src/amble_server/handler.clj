@@ -6,6 +6,7 @@
             [amble-server.utils :as utils]
             [amble-server.api.game :as game-api]
             [amble-server.api.player :as player-api]
+            [amble-server.api.move :as move-api]
             [amble-server.api.board :as board-api]))
 
 (defn middleware-custom [handler]
@@ -26,6 +27,7 @@
            (GET "/game/:game-id/player" [] player-api/get-all)
            (GET "/game/:game-id/player/:player-id" [] player-api/get)
            (POST "/game" [] game-api/add!)
+           (POST "/game/:game-id/player/:player-id/move" [] move-api/add!)
            (DELETE "/game/:game-id" [] game-api/delete!)
            (route/not-found "Not Found"))
 
