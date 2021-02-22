@@ -3,7 +3,9 @@
    [amble-server.resource.move :as move-resource]
    [amble-server.resource.game :as game-resource]
    [ring.util.response :as response-util]
-   [ring.util.request :as request-util])
+   [ring.util.request :as request-util]
+   [clojure.data.json :as json]
+   [clojure.edn :as edn])
   (:import (java.util Base64)))
 
 (declare move-id)
@@ -14,7 +16,10 @@
   (try
     (let [game-id (:game-id (:params req))
           player-id (:player-id (:params req))
-          move (request-util/body-string req)
+          move (json/read-str (request-util/body-string req)
+                              :key-fn keyword)
+          _ (println "move")
+          _ (println move)
           game-found (game-resource/get game-id)]
       (cond (not game-found)
             (response-util/status req 404)
@@ -28,6 +33,7 @@
                   _ (assert (= move-id
                                (move-resource/add! game-id, player-id, move-id, move))
                             (format "Problem with adding player's, \"%s\", move, \"%s\".", player-id, move-id))]
+              (amble-async/post-move! game-id, player-id, move-id)
               (-> (response-util/response {:move-id move-id})
                   (response-util/status 201)))))
     (catch Throwable e
