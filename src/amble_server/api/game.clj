@@ -1,11 +1,9 @@
 (ns amble-server.api.game
   (:require
-    [amble-server.resource.game :as game-resource]
-    [amble-server.resource.player :as player-resource]
-    [ring.util.response :as response-util]
-    [amble-server.utils :as utils]))
-
-
+   [amble-server.resource.game :as game-resource]
+   [amble-server.resource.player :as player-resource]
+   [ring.util.response :as response-util]
+   [amble-server.utils :as utils]))
 
 (defn add!
   "Adds a new game.
@@ -25,8 +23,7 @@
         (-> (response-util/response "Conflict.")
             (response-util/status 409))
         ;else
-        (let [
-              was-game-created (game-resource/create! game-id)
+        (let [was-game-created (game-resource/create! game-id)
               players-created (doall (map (fn [i]
                                             (player-resource/add! game-id (str "player-"
                                                                                (nth ["one", "two", "three", "four", "five", "six"]
@@ -36,7 +33,6 @@
                               (assert (pos-int? write-result)
                                       "Unexpected db result while adding game."))
                             (conj players-created was-game-created)))]
-
 
           (-> (response-util/response {:game-id game-id})
               (response-util/status 201)))))
@@ -58,7 +54,6 @@
         (println e)
         (response-util/status req 500)))))
 
-
 (defn delete! [req]
   (let [game-id (:game-id (:params req))
         already-existing-game-id (game-resource/get game-id)]
@@ -66,7 +61,6 @@
           (-> (response-util/response {:game-id game-id})
               (response-util/status 200))
           :else
-          (let [
-                game-id (game-resource/delete! game-id)]
+          (let [game-id (game-resource/delete! game-id)]
             (-> (response-util/response {:game-id game-id})
                 (response-util/status 200))))))

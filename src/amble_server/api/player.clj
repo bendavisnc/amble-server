@@ -1,11 +1,11 @@
 (ns amble-server.api.player
   (:require
-    [amble-server.resource.game :as game-resource]
-    [amble-server.resource.player :as player-resource]
-    [ring.util.response :as response-util]
-    [amble-server.utils :as utils]
-    [clojure.java.io :as io]
-    [clojure.edn :as edn]))
+   [amble-server.resource.game :as game-resource]
+   [amble-server.resource.player :as player-resource]
+   [ring.util.response :as response-util]
+   [amble-server.utils :as utils]
+   [clojure.java.io :as io]
+   [clojure.edn :as edn]))
 
 (defn get-all [req]
   (let [game-id (:game-id (:params req))
@@ -15,12 +15,11 @@
             (response-util/status req 404)
             :default
             (response-util/response
-              (player-resource/get-all game-id)))
+             (player-resource/get-all game-id)))
       (catch Throwable e
         (println "An error occurred during game board get.")
         (println e)
         (response-util/status req 500)))))
-
 
 (defn crude-player-indexes-map [player-id]
   (let [ordered
@@ -53,19 +52,5 @@
         _ (assert (= id id-from-db))]
 
     (response-util/response
-      (crude-player-indexes-map id))))
+     (crude-player-indexes-map id))))
 
-
-;(println "wut"
-;    (println [game-id, id])
-;    (try
-;      (cond (not game-found)
-;            (response-util/status req 404)
-;            :default
-;            (response-util/response
-;              (player-resource/get game-id id)))
-;      (catch Throwable e
-;        (println "An error occurred during game board get.")
-;        (println e)
-;        (response-util/status req 500))))
-;

@@ -1,7 +1,7 @@
 (ns amble-server.db.player
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [amble-server.db.core :as db]))
+   [clojure.java.jdbc :as jdbc]
+   [amble-server.db.core :as db]))
 
 (defn find
   ([game-id]
@@ -12,7 +12,6 @@
    (let [found
          (jdbc/query db/db ["select * from player where gameId = ? and id = ?" game-id id])]
      (first (map :id found)))))
-
 
 (defn add!
   [game-id, id]

@@ -1,11 +1,9 @@
 (ns amble-server.api.move
   (:require
-    [amble-server.resource.move :as move-resource]
-    [amble-server.resource.game :as game-resource]
-    [ring.util.response :as response-util]
-    [amble-server.utils :as utils]
-    [clojure.java.io :as io]
-    [clojure.edn :as edn])
+   [amble-server.resource.move :as move-resource]
+   [amble-server.resource.game :as game-resource]
+   [ring.util.response :as response-util]
+   [ring.util.request :as request-util])
   (:import (java.util Base64)))
 
 (declare move-id)
@@ -16,27 +14,28 @@
   (try
     (let [game-id (:game-id (:params req))
           player-id (:player-id (:params req))
-          move (:body req)
+          move (request-util/body-string req)
           game-found (game-resource/get game-id)]
-       (cond (not game-found)
-             (response-util/status req 404)
+      (cond (not game-found)
+            (response-util/status req 404)
 
-             (or (not game-id)
-                 (not player-id))
-             (-> (response-util/response "Missing parameters. \n  \"gameId\" and \"moveId\" are both required.")
-                 (response-util/status 400))
-             :default
-             (let [move-id (move-id player-id)
-                   move-add
-                   (move-resource/add! game-id, player-id, move-id, move)
-                   _ (println (format "Successfully added move, \"%s\"\nmove data:\n  %s.", move-id, move-add))]
-               (-> (response-util/response {:move-id move-id})
-                   (response-util/status 201)))))
+            (or (not game-id)
+                (not player-id))
+            (-> (response-util/response "Missing parameters. \n  \"gameId\" and \"moveId\" are both required.")
+                (response-util/status 400))
+            :default
+            (let [move-id (move-id player-id)
+                  _ (assert (= move-id
+                               (move-resource/add! game-id, player-id, move-id, move))
+                            (format "Problem with adding player's, \"%s\", move, \"%s\".", player-id, move-id))]
+              (-> (response-util/response {:move-id move-id})
+                  (response-util/status 201)))))
     (catch Throwable e
       (println "An error occurred during game move add.")
       (println e)
       (response-util/status req 500))))
 
 (defn move-id [player-id]
-  (.encode (Base64/getEncoder)
-           (.getBytes (str [player-id, (System/currentTimeMillis)]))))
+  (apply str
+         (.encode (Base64/getEncoder)
+                  (.getBytes (str [player-id, (System/currentTimeMillis)])))))

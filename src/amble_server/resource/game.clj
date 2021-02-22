@@ -1,6 +1,6 @@
 (ns amble-server.resource.game
   (:require
-    [amble-server.db.game :as game-db]))
+   [amble-server.db.game :as game-db]))
 
 (declare inform)
 

@@ -1,7 +1,7 @@
 (ns amble-server.db.move
   (:require
-    [clojure.java.jdbc :as jdbc]
-    [amble-server.db.core :as db]))
+   [clojure.java.jdbc :as jdbc]
+   [amble-server.db.core :as db]))
 
 ;(defn find
 ;  ([game-id, id]

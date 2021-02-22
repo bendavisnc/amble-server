@@ -13,7 +13,8 @@
 
 
   :plugins [[lein-ring "0.12.5"]
-            [lein-auto "0.1.3"]]
+            [lein-auto "0.1.3"]
+            [lein-cljfmt "0.7.0"]]
   :ring {:handler amble-server.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

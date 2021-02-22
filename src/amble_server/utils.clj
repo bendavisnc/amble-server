@@ -9,7 +9,7 @@
 
 (defn momentary-game-name []
   (str
-    "The"
-    (day-of-week)
-    "Game"))
+   "The"
+   (day-of-week)
+   "Game"))
 
