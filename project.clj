@@ -16,6 +16,10 @@
             [lein-auto "0.1.3"]
             [lein-cljfmt "0.7.0"]]
   :ring {:handler amble-server.handler/app}
-  :profiles
+         :websockets {"/async" amble-server.async.core/handler})
+
+:profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.2"]]}})
+                        [ring/ring-mock "0.3.2"]]}}
+  :java-source-paths ["src-java"]
+  :javac-options     ["-target" "1.11" "-source" "1.11"]
