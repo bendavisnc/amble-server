@@ -2,7 +2,7 @@
   (:require
    [amble-server.resource.move :as move-resource]
    [amble-server.resource.game :as game-resource]
-   [amble-server.remote-control :as amble-async]
+   [amble-server.async-resource.move :as async-resource-move]
    [ring.util.response :as response-util]
    [ring.util.request :as request-util]
    [clojure.data.json :as json])
@@ -33,7 +33,7 @@
                   _ (assert (= move-id
                                (move-resource/add! game-id, player-id, move-id, move))
                             (format "Problem with adding player's, \"%s\", move, \"%s\".", player-id, move-id))]
-              (amble-async/post-move! game-id, player-id, move-id)
+              (async-resource-move/post-announcement! game-id, player-id, move-id)
               (-> (response-util/response {:move-id move-id})
                   (response-util/status 201)))))
     (catch Throwable e
