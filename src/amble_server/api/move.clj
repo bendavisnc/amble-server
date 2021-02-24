@@ -2,10 +2,10 @@
   (:require
    [amble-server.resource.move :as move-resource]
    [amble-server.resource.game :as game-resource]
+   [amble-server.remote-control :as amble-async]
    [ring.util.response :as response-util]
    [ring.util.request :as request-util]
-   [clojure.data.json :as json]
-   [clojure.edn :as edn])
+   [clojure.data.json :as json])
   (:import (java.util Base64)))
 
 (declare move-id)

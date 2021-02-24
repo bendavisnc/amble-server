@@ -1,7 +1,5 @@
-(ns amble-server.async.core
+(ns amble-server.remote-control
   (:import (amble_server.async GameSubscriber)))
-
-(def websockets-handler)
 
 (defn post-move-announcement!
   "Asynchronously send out move notification to all game subscribers."
@@ -10,43 +8,35 @@
     (do
       (println "Hey I'm a game subscriber to post moves to!")
       (println subscriber)))
+
   nil)
 
 (defn add-game-subscriber! [game-id, player-id]
-  (GameSubscriber/addSubscriber game-id, player-id)
+  (GameSubscriber/addGameSubscriber game-id, player-id)
   nil)
 
-(ns ring-websocket-example.echo
-  (:require [ring-jetty.util.ws :as ws]))
-
-(def all-sessions (ref #{}))
-
 (defn- on-connect [session]
-  (dosync
-   (alter all-sessions conj session)))
+  (println "Websocket on connect invoked."))
 
 (defn- on-close [session code reason]
-  (dosync
-   (alter all-sessions disj session)))
+  (println "Websocket on close invoked."))
 
 (defn- on-text [session message]
-  (doseq [s @all-sessions]
-    (ws/send! s (str
-                 (.. session getSession getRemoteAddress getHostName)
-                 ":"
-                 message))))
+  (println "Websocket on text invoked."))
 
 (defn- on-bytes [session payload offset len]
+  (println "Websocket on bytes invoked.")
   nil)
 
 (defn- on-error [session e]
+  (println "Websocket on error invoked.")
   (.printStackTrace e)
-  (dosync
-   (alter all-sessions disj session)))
+  nil)
 
-(def handler
+(def websockets-handler
   {:on-connect on-connect
    :on-error on-error
    :on-text on-text
    :on-close on-close
    :on-bytes on-bytes})
+
