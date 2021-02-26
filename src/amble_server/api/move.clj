@@ -6,9 +6,13 @@
    [ring.util.response :as response-util]
    [ring.util.request :as request-util]
    [clojure.data.json :as json])
-  (:import (java.util Base64)))
+  (:import [java.util Base64]
+           [org.apache.logging.log4j Logger]
+           [org.apache.logging.log4j LogManager]))
 
 (declare move-id)
+
+(def log (. LogManager getLogger "amble-server.api.move"))
 
 (defn add!
   "Returns either a not found, an error, or a successful new move's id."
@@ -18,8 +22,8 @@
           player-id (:player-id (:params req))
           move (json/read-str (request-util/body-string req)
                               :key-fn keyword)
-          _ (println "move")
-          _ (println move)
+          _ (.debug log "move")
+          _ (.debug log move)
           game-found (game-resource/get game-id)]
       (cond (not game-found)
             (response-util/status req 404)
@@ -37,8 +41,8 @@
               (-> (response-util/response {:move-id move-id})
                   (response-util/status 201)))))
     (catch Throwable e
-      (println "An error occurred during game move add.")
-      (println e)
+      (.error log "An error occurred during game move add.")
+      (.error log e)
       (response-util/status req 500))))
 
 (defn move-id [player-id]

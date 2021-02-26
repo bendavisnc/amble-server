@@ -4,7 +4,11 @@
    [ring.util.response :as response-util]
    [amble-server.utils :as utils]
    [clojure.java.io :as io]
-   [clojure.edn :as edn]))
+   [clojure.edn :as edn])
+  (:import [org.apache.logging.log4j Logger]
+           [org.apache.logging.log4j LogManager]))
+
+(def log (. LogManager getLogger "amble-server.api.board"))
 
 (defn get
   "Returns either a not found, an error, or a constant value'd response representing the piece coordinates of a chinese checkers set."
@@ -19,7 +23,7 @@
             (response-util/response
              (edn/read-string (slurp (io/resource "board.json")))))
       (catch Throwable e
-        (println "An error occurred during game board get.")
+        (.info log "An error occurred during game board get.")
         (println e)
         (response-util/status req 500)))))
 

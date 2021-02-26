@@ -3,7 +3,11 @@
    [amble-server.resource.game :as game-resource]
    [amble-server.resource.player :as player-resource]
    [ring.util.response :as response-util]
-   [amble-server.utils :as utils]))
+   [amble-server.utils :as utils])
+  (:import [org.apache.logging.log4j Logger]
+           [org.apache.logging.log4j LogManager]))
+
+(def log (. LogManager getLogger "amble-server.api.board"))
 
 (defn add!
   "Adds a new game.
@@ -14,9 +18,9 @@
     (let [game-id-prefix ((:headers req)
                           (name :x-amble-game-id-prefix))
           _ (when game-id-prefix
-              (println (str "Using game id prefix value, \""
-                            game-id-prefix
-                            "\".")))
+              (.info log (str "Using game id prefix value, \""
+                              game-id-prefix
+                              "\".")))
           game-id (str game-id-prefix (utils/momentary-game-name))
           already-existing-game-id (game-resource/get game-id)]
       (if (not (nil? already-existing-game-id))
@@ -37,8 +41,8 @@
           (-> (response-util/response {:game-id game-id})
               (response-util/status 201)))))
     (catch Throwable e
-      (println "An error occurred during game create.")
-      (println e)
+      (.error log "An error occurred during game create.")
+      (.error log e)
       (response-util/status req 500))))
 
 (defn get [req]
@@ -50,8 +54,8 @@
             :default
             (response-util/response found))
       (catch Throwable e
-        (println "An error occurred during game get.")
-        (println e)
+        (.error log "An error occurred during game get.")
+        (.error log e)
         (response-util/status req 500)))))
 
 (defn delete! [req]
