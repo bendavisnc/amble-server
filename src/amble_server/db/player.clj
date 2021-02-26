@@ -16,8 +16,10 @@
 (defn add!
   [game-id, id]
   (let [write
-        (jdbc/insert! db/db :player {:id id, :gameId game-id})]
-    (first (map (fn [w]
-                  (let [k (first (keys w))]
-                    (k w)))
-                write))))
+        (jdbc/insert! db/db :player {:id id, :gameId game-id})
+        db-result (first (map (fn [w]
+                                (let [k (first (keys w))]
+                                  (k w)))
+                              write))
+        _ (assert pos? db-result)]
+    id))

@@ -8,19 +8,20 @@
 (defn add! [game-id, id]
   (player-db/add! game-id id)
   (.info log "Game has new added player.")
-  (.info log (str "  - "
-                  [game-id, id])))
+  (.info log (str "  "
+                  [game-id, id]))
+  id)
 
 
 (defn get-all [game-id]
   (let [game-players (player-db/find game-id)]
     (if (empty? game-players)
       (do (.info log "Game has no players.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [game-id])))
       ;;else
       (do (.info log "Game has players found.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [game-id, game-players]))))
     game-players))
 
@@ -30,10 +31,10 @@
   (let [game-player (player-db/find game-id id)]
     (if (nil? game-player)
       (do (.info log "Game has no player with such id.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [game-id, id])))
       ;;else
       (do (.info log "Game has player found.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [game-id, game-player]))))
     game-player))

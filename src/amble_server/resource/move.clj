@@ -18,10 +18,3 @@
                           [player-id, id, game-id]))))
 
     id))
-
-  ;(.debug log [player-id, id, game-id])
-  ;(.info log "Adding player move to game.")
-  ;(.info log [player-id, id, game-id]) ;; todo, reword
-  ;(move-db/add! game-id, player-id, id, move)
-  ;id)
-

@@ -7,7 +7,7 @@
   (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
 
-(def log (. LogManager getLogger "amble-server.api.board"))
+(def log (. LogManager getLogger "amble-server.api.game"))
 
 (defn add!
   "Adds a new game.
@@ -28,13 +28,15 @@
             (response-util/status 409))
         ;else
         (let [was-game-created (game-resource/create! game-id)
+              _ (assert (not (nil? was-game-created))
+                        "Problem creating game.")
               players-created (doall (map (fn [i]
                                             (player-resource/add! game-id (str "player-"
                                                                                (nth ["one", "two", "three", "four", "five", "six"]
                                                                                     i))))
                                           (range 6)))
               _ (doall (map (fn [write-result]
-                              (assert (pos-int? write-result)
+                              (assert (not (nil? write-result))
                                       "Unexpected db result while adding game."))
                             (conj players-created was-game-created)))]
 

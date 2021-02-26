@@ -18,8 +18,8 @@
   "Returns either a not found, an error, or a successful new move's id."
   [req]
   (try
-    (let [game-id (keyword (:game-id (:params req)))
-          player-id (keyword (:player-id (:params req)))
+    (let [game-id (:game-id (:params req))
+          player-id (:player-id (:params req))
           move (json/read-str (request-util/body-string req)
                               :key-fn keyword)
           _ (.debug log "move")

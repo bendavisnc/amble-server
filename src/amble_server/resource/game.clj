@@ -4,17 +4,19 @@
   (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
 
+(declare inform)
+
 (def log (. LogManager getLogger "amble-server.resource.game"))
 
 (defn get [id]
   (let [game (game-db/find id)]
     (if (nil? game)
       (do (.info log "Game is not found.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [id])))
       ;;else
       (do (.info log "Game found.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [id]))))
     game))
 
@@ -22,16 +24,17 @@
   ;(game-db/find id))
 
 (defn create! [id]
-  (let [game (game-db/create! id)]
-    (if (nil? game)
+  (let [game-db-result (game-db/create! id)]
+    (if (nil? game-db-result)
       (do (.info log "Game not created.")
-          (.info log (str "  - "
-                          [id])))
+          (.info log (str "  "
+                          [id]))
+          nil)
       ;;else
       (do (.info log "Game created.")
-          (.info log (str "  - "
-                          [id]))))
-    game))
+          (.info log (str "  "
+                          [id]))
+        id))))
 
 ;(defn delete! [id]
 ;  (inform "Deleting", id)
@@ -41,11 +44,11 @@
   (let [game (game-db/delete! id)]
     (if (nil? game)
       (do (.info log "Game not deleted.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [id])))
       ;;else
       (do (.info log "Game deleted.")
-          (.info log (str "  - "
+          (.info log (str "  "
                           [id]))))
     game))
 
