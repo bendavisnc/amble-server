@@ -16,6 +16,8 @@
  (.info log "Starting websockets ready web server.")
  (jetty/run-jetty amble-handler/app {:port 3000
                                      ;:websockets {"/game/:game-id/player/:player-id/async"
+                                     ;:websockets {"/game/:game-id/async"
+                                     ;:websockets {"/game/async"
                                      :websockets {"/async"
                                                   async-resource-core/handler-fns}}))
 

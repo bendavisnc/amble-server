@@ -4,7 +4,10 @@
    [amble-server.db.core :as db]))
 
 (defn find [id]
-  (let [found
+  (let [id (if (keyword? id)
+             (name id)
+             id)
+        found
         (jdbc/query db/db ["select * from game where id = ?" id])]
     (first (map :id found))))
 
@@ -17,6 +20,7 @@
                     (k w)))
                 write))))
 
+;; todo
 (defn delete!
   "Deletes the branch with the given game id."
   [game-id]

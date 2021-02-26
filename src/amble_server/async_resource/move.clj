@@ -12,6 +12,6 @@
       (subscriber-send-fn move-id)
       (println (format "Announced move, \"%s\".", move-id)))
     ;else)
-    (println (format "Missing subscriber for, \"%s\" while wanting to announce move, \"%s\".", [game-id, player-id], move-id))))
-nil
+    (println (format "Missing subscriber for, \"%s\" while wanting to announce move, \"%s\".", [game-id, player-id], move-id)))
+  nil)
 

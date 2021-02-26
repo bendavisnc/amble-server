@@ -18,8 +18,8 @@
   "Returns either a not found, an error, or a successful new move's id."
   [req]
   (try
-    (let [game-id (:game-id (:params req))
-          player-id (:player-id (:params req))
+    (let [game-id (keyword (:game-id (:params req)))
+          player-id (keyword (:player-id (:params req)))
           move (json/read-str (request-util/body-string req)
                               :key-fn keyword)
           _ (.debug log "move")
@@ -34,8 +34,9 @@
                 (response-util/status 400))
             :default
             (let [move-id (move-id player-id)
+                  move-id-post-add (move-resource/add! game-id, player-id, move-id, move)
                   _ (assert (= move-id
-                               (move-resource/add! game-id, player-id, move-id, move))
+                               move-id-post-add)
                             (format "Problem with adding player's, \"%s\", move, \"%s\".", player-id, move-id))]
               (async-resource-move/post-announcement! game-id, player-id, move-id)
               (-> (response-util/response {:move-id move-id})
