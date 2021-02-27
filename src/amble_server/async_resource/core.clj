@@ -23,7 +23,7 @@
 (defn on-bytes [& args]
   (.info log "on-bytes"))
 
-(def handler-fns {:on-connnect on-connect
+(def handler-fns {:on-connect on-connect
                   :on-error on-error
                   :on-text on-text
                   :on-close on-close
