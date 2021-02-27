@@ -11,11 +11,23 @@
   (.info log args)
   (async-move/on-connect! nil, nil, nil))
 
-(def handler-fns {:on-connnect on-connect})
-                  ;:on-error on-error
-                  ;:on-text on-text
-                  ;:on-close on-close
-                  ;:on-bytes on-bytes
+(defn on-error [& args]
+  (.info log "on-error"))
+
+(defn on-text [& args]
+  (.info log "on-text"))
+
+(defn on-close [& args]
+  (.info log "on-close"))
+
+(defn on-bytes [& args]
+  (.info log "on-bytes"))
+
+(def handler-fns {:on-connnect on-connect
+                  :on-error on-error
+                  :on-text on-text
+                  :on-close on-close
+                  :on-bytes on-bytes})
 
 
 
