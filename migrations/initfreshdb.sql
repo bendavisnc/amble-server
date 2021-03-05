@@ -5,16 +5,16 @@ CREATE TABLE IF NOT EXISTS "Game" (
 );
 CREATE TABLE IF NOT EXISTS "Move" (
 	"id"	TEXT,
-	"playerId"	TEXT,
-	"gameId"	TEXT,
+	"player_id"	TEXT,
+	"game_id"	TEXT,
 	"move"	TEXT,
-	FOREIGN KEY("gameId") REFERENCES "Game"("id"),
-	FOREIGN KEY("playerId") REFERENCES "Player"("id"),
+	FOREIGN KEY("game_id") REFERENCES "Game"("id") ON DELETE CASCADE,
+	FOREIGN KEY("player_id") REFERENCES "Player"("id") ON DELETE CASCADE,
 	PRIMARY KEY("id")
 );
 CREATE TABLE IF NOT EXISTS "Player" (
 	"id"	TEXT,
-	"gameId"	TEXT,
-	FOREIGN KEY("gameId") REFERENCES "Game"("id")
+	"game_id"	TEXT,
+	FOREIGN KEY("game_id") REFERENCES "Game"("id") ON DELETE CASCADE
 );
 COMMIT;

@@ -33,6 +33,7 @@
   (GET "/game/:game-id/player/:player-id" [] player-api/get)
   (POST "/game" [] game-api/add!)
   (POST "/game/:game-id/player/:player-id/move" [] move-api/add!)
+  (GET "/game/:game-id/player/:player-id/move/:id" [] move-api/get)
   (OPTIONS "/game/:game-id/player/:player-id/move" [] "")
   (DELETE "/game/:game-id" [] game-api/delete!)
   (route/not-found "Not Found"))

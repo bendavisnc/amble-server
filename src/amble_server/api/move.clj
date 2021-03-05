@@ -46,6 +46,22 @@
       (.error log e)
       (response-util/status req 500))))
 
+(defn get [req]
+  (let [game-id (:game-id (:params req))
+        player-id (:player-id (:params req))
+        id (:id (:params req))
+        found (move-resource/get game-id, player-id, id)]
+
+    (try
+      (cond (not found)
+            (response-util/status req 404)
+            :default
+            (response-util/response found))
+      (catch Throwable e
+        (.error log "An error occurred during move get.")
+        (.error log e)
+        (response-util/status req 500)))))
+
 (defn move-id [player-id]
   (apply str
          (.encode (Base64/getEncoder)

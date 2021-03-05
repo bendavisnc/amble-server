@@ -6,35 +6,55 @@
 (def log (. LogManager getLogger "amble-server.resource.player"))
 
 (defn add! [game-id, id]
-  (player-db/add! game-id id)
-  (.info log "Game has new added player.")
-  (.info log (str "  "
-                  [game-id, id]))
-  id)
+  (let [db-result (player-db/add! game-id, id)
+        db-result-type (first (keys db-result))]
+    (cond (= player-db/failure db-result-type)
+          (if (nil? (player-db/failure db-result))
+            (do (.info log "Player not added for unknown, nil reason.")
+                (.info log (str "  "
+                                [game-id, id]))
+                nil)
+            ;;else
+            (do (.info log "Player resource add is being thrown from bad db result.")
+                (.info log (str "  "
+                                [game-id, id, (player-db/failure db-result)]))
+                (throw (player-db/failure db-result))))
 
+          (= player-db/success db-result-type)
+          (player-db/success db-result))))
 
 (defn get-all [game-id]
-  (let [game-players (player-db/find game-id)]
-    (if (empty? game-players)
-      (do (.info log "Game has no players.")
-          (.info log (str "  "
-                          [game-id])))
-      ;;else
-      (do (.info log "Game has players found.")
-          (.info log (str "  "
-                          [game-id, game-players]))))
-    game-players))
+  (let [db-result (player-db/find game-id)
+        db-result-type (first (keys db-result))]
+    (cond (= player-db/failure db-result-type)
+          (if (nil? (player-db/failure db-result))
+            (do (.info log "Players not found.")
+                (.info log (str "  "
+                                [game-id]))
+                nil)
+            ;;else
+            (do (.info log "Player resource get all is being thrown from bad db result.")
+                (.info log (str "  "
+                                [game-id, (player-db/failure db-result)]))
+                (throw (player-db/failure db-result))))
 
-
+          (= player-db/success db-result-type)
+          (player-db/success db-result))))
 
 (defn get [game-id, id]
-  (let [game-player (player-db/find game-id id)]
-    (if (nil? game-player)
-      (do (.info log "Game has no player with such id.")
-          (.info log (str "  "
-                          [game-id, id])))
-      ;;else
-      (do (.info log "Game has player found.")
-          (.info log (str "  "
-                          [game-id, game-player]))))
-    game-player))
+  (let [db-result (player-db/find game-id, id)
+        db-result-type (first (keys db-result))]
+    (cond (= player-db/failure db-result-type)
+          (if (nil? (player-db/failure db-result))
+            (do (.info log "Player not found.")
+                (.info log (str "  "
+                                [id]))
+                nil)
+            ;;else
+            (do (.info log "Player resource get is being thrown from bad db result.")
+                (.info log (str "  "
+                                [id, (player-db/failure db-result)]))
+                (throw (player-db/failure db-result))))
+
+          (= player-db/success db-result-type)
+          (player-db/success db-result))))

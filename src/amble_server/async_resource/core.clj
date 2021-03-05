@@ -12,7 +12,7 @@
 (def log (. LogManager getLogger "amble-server.async-resource.core"))
 
 (def path
-     "/game/async")
+  "/game/async")
 
 (defn session-id [request-map]
   (let [headers-map (:headers request-map)

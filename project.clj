@@ -12,6 +12,7 @@
                  [org.apache.logging.log4j/log4j-api "2.14.0"]
                  [org.apache.logging.log4j/log4j-core "2.14.0"]
                  [org.clojure/java.jdbc "0.7.8"]
+                 [yesql "0.5.3"]
                  [org.xerial/sqlite-jdbc "3.23.1"]]
 
 

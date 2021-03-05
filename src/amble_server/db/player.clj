@@ -1,25 +1,34 @@
 (ns amble-server.db.player
-  (:require
-   [clojure.java.jdbc :as jdbc]
-   [amble-server.db.core :as db]))
+  (:require [amble-server.db.player-sql :as player-sql]))
 
-(defn find
-  ([game-id]
-   (let [found
-         (jdbc/query db/db ["select * from player where gameId = ?" game-id])]
-     (map :id found)))
-  ([game-id, id]
-   (let [found
-         (jdbc/query db/db ["select * from player where gameId = ? and id = ?" game-id id])]
-     (first (map :id found)))))
+(def success ::sucess)
+(def failure ::failure)
 
 (defn add!
   [game-id, id]
-  (let [write
-        (jdbc/insert! db/db :player {:id id, :gameId game-id})
-        db-result (first (map (fn [w]
-                                (let [k (first (keys w))]
-                                  (k w)))
-                              write))
-        _ (assert pos? db-result)]
-    id))
+  (try (let [db-result
+             (player-sql/add! game-id, id)]
+         (if (not (pos? db-result))
+           {failure (new IllegalStateException (format "Bad db result \"%s\".",
+                                                       db-result))}
+           {success id}))
+       (catch Throwable e
+         {failure e})))
+
+(defn find
+  ([game-id]
+   (try (let [found*
+              (player-sql/find game-id)
+              found
+              (map :id found*)]
+          {success found})
+        (catch Throwable e
+          {failure e})))
+  ([game-id, id]
+   (try (let [found*
+              (player-sql/find game-id, id)
+              found
+              (first (map :id found*))]
+          {success found})
+        (catch Throwable e
+          {failure e}))))

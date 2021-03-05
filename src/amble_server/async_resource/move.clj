@@ -16,7 +16,6 @@
     (.info log (str "  "
                     [game-id, @connected-subscribers-atom]))))
 
-
 (defn post-announcement! [game-id, player-id, move-id]
   (let [subscribers (get (deref connected-subscribers-atom)
                          game-id)

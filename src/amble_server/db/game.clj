@@ -1,25 +1,31 @@
 (ns amble-server.db.game
-  (:require
-   [clojure.java.jdbc :as jdbc]
-   [amble-server.db.core :as db]))
+  (:require [amble-server.db.game-sql :as game-sql]))
 
-(defn find [id]
-  (let [found
-        (jdbc/query db/db ["select * from game where id = ?" id])]
-    (first (map :id found))))
+(def success ::sucess)
+(def failure ::failure)
 
 (defn create!
   [id]
-  (let [write
-        (jdbc/insert! db/db :game {:id id})
-        db-result (first (map (fn [w]
-                                (let [k (first (keys w))]
-                                  (k w)))
-                              write))
-        _ (assert pos? db-result)]
-    id))
+  (try (let [db-result
+             (game-sql/create! id)]
+         (if (not (pos? db-result))
+           {failure (new IllegalStateException (format "Bad db result \"%s\".",
+                                                       db-result))}
+           {success id}))
+       (catch Throwable e
+         {failure e})))
+
+(defn find [id]
+  (try (let [found*
+             (game-sql/find id)
+             found
+             (first (map :id found*))]
+         {success found})
+       (catch Throwable e
+         {failure e})))
 
 (defn delete!
   "Deletes the branch with the given game id."
   [game-id]
-  nil)
+  nil) ;; todo
+
