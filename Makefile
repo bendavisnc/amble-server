@@ -1,5 +1,5 @@
 rundevserver: initdb
-	lein ring server-headless
+	lein run
 
 initdb: clean
 	mkdir ../.amble-db

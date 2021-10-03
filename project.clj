@@ -24,6 +24,8 @@
   :main amble-server.main
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.2"]]}}
+                        [ring/ring-mock "0.3.2"]
+                        [ring/ring-devel "1.9.4"]]
+                       :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]}}
   :java-source-paths ["src-java"]
   :javac-options     ["-target" "1.8" "-source" "1.8"])

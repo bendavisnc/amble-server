@@ -25,7 +25,15 @@
          {failure e})))
 
 (defn delete!
-  "Deletes the branch with the given game id."
-  [game-id]
-  nil) ;; todo
+  "Deletes the game with the given game id."
+  [id]
+  (try (let [db-result
+             (game-sql/delete! id)]
+         (if (not (pos? db-result))
+           {failure (new IllegalStateException (format "Bad db result \"%s\".",
+                                                       db-result))}
+           {success id}))
+       (catch Throwable e
+         {failure e})))
+
 

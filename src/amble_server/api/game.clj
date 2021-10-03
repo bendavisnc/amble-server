@@ -47,6 +47,23 @@
       (.error log e)
       (response-util/status req 500))))
 
+(defn get-id [req]
+  (let [game-id-prefix ((:headers req)
+                        (name :x-amble-game-id-prefix))
+        _ (when game-id-prefix
+            (.info log (str "Using game id prefix value, \""
+                            game-id-prefix
+                            "\".")))
+        game-id (str game-id-prefix (utils/momentary-game-name))]
+    (try
+      (assert (not (nil? game-id))
+              "`game-id` is nil.")
+      game-id
+      (catch Throwable e
+        (.error log "An error occurred during game get id.")
+        (.error log e)
+        (response-util/status req 500)))))
+
 (defn get [req]
   (let [game-id (:game-id (:params req))
         found (game-resource/get game-id)]
@@ -60,11 +77,13 @@
         (.error log e)
         (response-util/status req 500)))))
 
+
 (defn delete! [req]
   (let [game-id (:game-id (:params req))
+        no-game-id ""
         already-existing-game-id (game-resource/get game-id)]
     (cond (not already-existing-game-id)
-          (-> (response-util/response {:game-id game-id})
+          (-> (response-util/response {:game-id no-game-id})
               (response-util/status 200))
           :else
           (let [game-id (game-resource/delete! game-id)]
