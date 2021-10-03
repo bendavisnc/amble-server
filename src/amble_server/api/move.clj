@@ -1,11 +1,11 @@
 (ns amble-server.api.move
   (:require
-   [amble-server.resource.move :as move-resource]
-   [amble-server.resource.game :as game-resource]
-   [amble-server.async-resource.move :as async-resource-move]
-   [ring.util.response :as response-util]
-   [ring.util.request :as request-util]
-   [clojure.data.json :as json])
+    [amble-server.resource.move :as move-resource]
+    [amble-server.resource.game :as game-resource]
+    [amble-server.async-resource.move :as async-resource-move]
+    [ring.util.response :as response-util]
+    [ring.util.request :as request-util]
+    [clojure.data.json :as json])
   (:import [java.util Base64]
            [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))

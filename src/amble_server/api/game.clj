@@ -1,9 +1,9 @@
 (ns amble-server.api.game
   (:require
-   [amble-server.resource.game :as game-resource]
-   [amble-server.resource.player :as player-resource]
-   [ring.util.response :as response-util]
-   [amble-server.utils :as utils])
+    [amble-server.resource.game :as game-resource]
+    [amble-server.resource.player :as player-resource]
+    [ring.util.response :as response-util]
+    [amble-server.utils :as utils])
   (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
 
@@ -51,11 +51,11 @@
   (let [game-id (:game-id (:params req))
         found (game-resource/get game-id)]
     (try
-      (cond (not found)
+       (cond (not found)
             (response-util/status req 404)
             :default
             (response-util/response found))
-      (catch Throwable e
+       (catch Throwable e
         (.error log "An error occurred during game get.")
         (.error log e)
         (response-util/status req 500)))))

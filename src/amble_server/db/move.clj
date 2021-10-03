@@ -1,8 +1,8 @@
 (ns amble-server.db.move
   (:require
-   [amble-server.db.move-sql :as move-sql])
+    [amble-server.db.move-sql :as move-sql])
   (:import
-   [org.apache.logging.log4j LogManager]))
+    [org.apache.logging.log4j LogManager]))
 
 (def log (. LogManager getLogger "amble-server.db.move"))
 

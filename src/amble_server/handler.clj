@@ -25,25 +25,25 @@
                     "*")))))
 
 (defroutes app-routes
-  (GET "/" [] "Hello World")
-  (GET "/game-id" [] (utils/momentary-game-name))
-  (GET "/game/:game-id" [] game-api/get)
-  (GET "/game/:game-id/board" [] board-api/get)
-  (GET "/game/:game-id/player" [] player-api/get-all)
-  (GET "/game/:game-id/player/:player-id" [] player-api/get)
-  (POST "/game" [] game-api/add!)
-  (POST "/game/:game-id/player/:player-id/move" [] move-api/add!)
-  (GET "/game/:game-id/player/:player-id/move/:id" [] move-api/get)
-  (OPTIONS "/game/:game-id/player/:player-id/move" [] "")
-  (DELETE "/game/:game-id" [] game-api/delete!)
-  (route/not-found "Not Found"))
+           (GET "/" [] "Hello World")
+           (GET "/game" [] game-api/get-id)
+           (GET "/game/:game-id" [] game-api/get)
+           (GET "/game/:game-id/board" [] board-api/get)
+           (GET "/game/:game-id/player" [] player-api/get-all)
+           (GET "/game/:game-id/player/:player-id" [] player-api/get)
+           (POST "/game" [] game-api/add!)
+           (POST "/game/:game-id/player/:player-id/move" [] move-api/add!)
+           (GET "/game/:game-id/player/:player-id/move/:id" [] move-api/get)
+           (OPTIONS "/game/:game-id/player/:player-id/move" [] "")
+           (DELETE "/game/:game-id" [] game-api/delete!)
+           (route/not-found "Not Found"))
 
 (def app (middleware-json/wrap-json-response
-          (middleware-custom
-           (middleware-default/wrap-defaults app-routes
-                                             (assoc-in middleware-default/api-defaults
-                                                       [:responses, :content-types]
-                                                       false)))
+           (middleware-custom
+              (middleware-default/wrap-defaults app-routes
+                                                  (assoc-in middleware-default/api-defaults
+                                                              [:responses, :content-types]
+                                                              false)))
 
-          {:pretty-print true}))
+           {:pretty-print true}))
 

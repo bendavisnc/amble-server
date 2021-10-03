@@ -1,10 +1,10 @@
 (ns amble-server.api.board
   (:require
-   [amble-server.resource.game :as game-resource]
-   [ring.util.response :as response-util]
-   [amble-server.utils :as utils]
-   [clojure.java.io :as io]
-   [clojure.edn :as edn])
+    [amble-server.resource.game :as game-resource]
+    [ring.util.response :as response-util]
+    [amble-server.utils :as utils]
+    [clojure.java.io :as io]
+    [clojure.edn :as edn])
   (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
 
@@ -21,7 +21,7 @@
             :default
             ;(response-util/response (slurp (io/resource "board.json")))
             (response-util/response
-             (edn/read-string (slurp (io/resource "board.json")))))
+              (edn/read-string (slurp (io/resource "board.json")))))
       (catch Throwable e
         (.info log "An error occurred during game board get.")
         (println e)

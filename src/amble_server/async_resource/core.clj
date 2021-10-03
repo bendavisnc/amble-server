@@ -20,7 +20,6 @@
         ring-session-id (-> cookie
                             (str/split (re-pattern "ring-session="))
                             last)]
-        ;(-> request-map :headers :ring-session)]
     (assert (not (nil? ring-session-id)))
     ring-session-id))
 
@@ -30,7 +29,7 @@
                   ["on-connect", args]))
 
   (let [ws (first args)
-        request-map  (jetty/req-of ws)
+        request-map (jetty/req-of ws)
         params (codec/form-decode (:query-string request-map))
         session-id (session-id request-map)
         game-id (get params "game-id")
@@ -59,10 +58,10 @@
                   ["on-bytes", args])))
 
 (def handler-fns {:on-connect on-connect
-                  :on-error on-error
-                  :on-text on-text
-                  :on-close on-close
-                  :on-bytes on-bytes})
+                  :on-error   on-error
+                  :on-text    on-text
+                  :on-close   on-close
+                  :on-bytes   on-bytes})
 
 ;(def websockets-handler
 ;  {:on-connect on-connect
