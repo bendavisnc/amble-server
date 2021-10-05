@@ -1,7 +1,7 @@
 (ns amble-server.db.player
   (:require [amble-server.db.player-sql :as player-sql]))
 
-(def success ::sucess)
+(def success ::success)
 (def failure ::failure)
 
 (defn add!

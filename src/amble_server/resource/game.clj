@@ -11,14 +11,14 @@
 (defn create! [id]
   (let [db-result (game-db/create! id)]
     (cond
-      (= [game-db/failure] (keys db-result))
+      (game-db/failure db-result)
       (do
         (.info log "Error occured while trying to create game.")
         (throw (new RuntimeException (game-db/failure db-result))))
       (= {game-db/success id} db-result)
       (do
         (.info log "Game created!")
-        (.info log (format "  (\"%s\")" id))
+        (.info log (format "  \"%s\"" id))
         (game-db/success db-result))
 
       :default
@@ -27,26 +27,30 @@
                (.info log (format "  \"%s\"" db-result))
                (throw (new RuntimeException db-result)))))))
 
-
-
-
 (defn get [id]
   (let [db-result (game-db/find id)
-        db-result-type (first (keys db-result))]
-    (cond (= game-db/failure db-result-type)
-          (if (nil? (game-db/failure db-result))
-            (do (.info log "Game not found.")
-                (.info log (str "  "
-                                [id]))
-                nil)
-            ;;else
-            (do (.info log "Game resource get is being thrown from bad db result.")
-                (.info log (str "  "
-                                [id, (game-db/failure db-result)]))
-                (throw (game-db/failure db-result))))
+        nil-result-value nil]
+    (cond
+      (game-db/failure db-result)
+      (do
+        (.info log "Error occured while trying to get game.")
+        (throw (new RuntimeException (game-db/failure db-result))))
+      (= {game-db/success nil-result-value} db-result)
+      (do
+        (.info log "Game not found!")
+        (.info log (format "  \"%s\"" id))
+        nil-result-value)
+      (= {game-db/success id} db-result)
+      (do
+        (.info log "Game found!")
+        (.info log (format "  \"%s\"" id))
+        (game-db/success db-result))
+     :default
+      (do
+        (.info log "The unexpected occurred while trying to get game.")
+        (.info log (format "  \"%s\"" db-result))
+        (throw (new RuntimeException db-result))))))
 
-          (= game-db/success db-result-type)
-          (game-db/success db-result))))
 
 (defn delete! [id]
   (let [db-result (game-db/delete! id)]

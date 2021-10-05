@@ -1,6 +1,12 @@
-(ns amble-nonsense.main
-  (:require [amble-server.db.game-sql :as game-sql]))
+(ns amble-nonsense.main)
 
 (defn -main [& args]
-  (println "hi")
-  (println (game-sql/game-find-by-id)))
+  (println
+    (map (fn [x]
+           (mapcat (fn [y]
+                     [x, y, 7])
+                   [4, 6]))
+            ;[])))
+         [1 2 3])))
+;(for [x [1, 2]]
+     ;  (for [y [4, 6]]

@@ -10,7 +10,7 @@
 (defn -main [& args]
   (.info log "Starting websockets ready web server.")
   (jetty/run-jetty (reload/wrap-reload amble-handler/app) {:port       3000
-                                                           :join?      true
+                                                           ;:join?      true
                                                            :daemon?    true
                                                            :websockets {async-resource/path
                                                                         async-resource/handler-fns}}))

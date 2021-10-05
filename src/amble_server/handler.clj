@@ -26,7 +26,7 @@
 
 (defroutes app-routes
            (GET "/" [] "Hello World")
-           (GET "/game" [] game-api/get-id)
+           (GET "/id/default-game" [] game-api/get-game-id)
            (GET "/game/:game-id" [] game-api/get)
            (GET "/game/:game-id/board" [] board-api/get)
            (GET "/game/:game-id/player" [] player-api/get-all)

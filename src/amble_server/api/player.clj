@@ -43,14 +43,13 @@
 
 (defn get [req]
   (let [game-id (:game-id (:params req))
-        id (:player-id (:params req))
-        game-found-seq (lazy-seq (cons (game-resource/get game-id) nil))
-        _ (assert (= 1 (count game-found-seq)))
-        player-found-seq (lazy-cat (for [_ game-found-seq]
-                                     (player-resource/get game-id id)))
-        id-from-db (first player-found-seq)
-        _ (assert (= id id-from-db))]
+        id (:player-id (:params req))]
+    (if-let [player-id (player-resource/get game-id, id)]
+      (-> (response-util/response {:player-id player-id})
+          (response-util/status 200))
+      (-> (response-util/response {:player-id ""})
+          (response-util/status 404)))))
 
-    (response-util/response
-      (crude-player-indexes-map id))))
+;(response-util/response
+;(crude-player-indexes-map id)))))
 

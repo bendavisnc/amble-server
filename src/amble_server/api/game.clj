@@ -47,7 +47,7 @@
       (.error log e)
       (response-util/status req 500))))
 
-(defn get-id [req]
+(defn get-game-id [req]
   (let [game-id-prefix ((:headers req)
                         (name :x-amble-game-id-prefix))
         _ (when game-id-prefix
@@ -58,6 +58,8 @@
     (try
       (assert (not (nil? game-id))
               "`game-id` is nil.")
+      (.info log "Providing game id.")
+      (.info log (format "  \"%s\"" game-id))
       game-id
       (catch Throwable e
         (.error log "An error occurred during game get id.")
@@ -65,27 +67,34 @@
         (response-util/status req 500)))))
 
 (defn get [req]
-  (let [game-id (:game-id (:params req))
-        found (game-resource/get game-id)]
-    (try
-       (cond (not found)
-            (response-util/status req 404)
-            :default
-            (response-util/response found))
-       (catch Throwable e
-        (.error log "An error occurred during game get.")
-        (.error log e)
-        (response-util/status req 500)))))
+  (try
+    (let [game-id (:game-id (:params req))
+          found (game-resource/get game-id)]
+      (cond (not found)
+            (-> (response-util/response {:game-id ""})
+                (response-util/status 404))
+           :default
+           (response-util/response found)))
+    (catch Throwable e
+      (.error log "An error occurred during game get.")
+      (.error log e)
+      (response-util/status req 500))))
 
 
 (defn delete! [req]
-  (let [game-id (:game-id (:params req))
-        no-game-id ""
-        already-existing-game-id (game-resource/get game-id)]
-    (cond (not already-existing-game-id)
-          (-> (response-util/response {:game-id no-game-id})
-              (response-util/status 200))
-          :else
-          (let [game-id (game-resource/delete! game-id)]
-            (-> (response-util/response {:game-id game-id})
-                (response-util/status 200))))))
+  (try
+    (let [game-id (:game-id (:params req))
+          no-game-id ""
+          already-existing-game-id (game-resource/get game-id)]
+      (cond (not already-existing-game-id)
+            (-> (response-util/response {:game-id no-game-id})
+                (response-util/status 200))
+            :else
+            (let [game-id (game-resource/delete! game-id)]
+              (-> (response-util/response {:game-id game-id})
+                  (response-util/status 200)))))
+    (catch Throwable e
+      (.error log "An error occurred during game delete.")
+      (.error log e)
+      (response-util/status req 500))))
+

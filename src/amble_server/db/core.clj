@@ -5,4 +5,5 @@
 (def db
   {:classname   "org.sqlite.JDBC"
    :subprotocol "sqlite"
-   :subname     target-db-path})
+   :subname     target-db-path
+   :foreign_keys "on"})
