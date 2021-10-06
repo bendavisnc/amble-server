@@ -68,18 +68,16 @@
 
 (defn get [req]
   (try
-    (let [game-id (:game-id (:params req))
-          found (game-resource/get game-id)]
-      (cond (not found)
-            (-> (response-util/response {:game-id ""})
-                (response-util/status 404))
-           :default
-           (response-util/response found)))
+    (let [game-id (:game-id (:params req))]
+      (if-let [game-id (game-resource/get game-id)]
+        (-> (response-util/response {:game-id game-id})
+            (response-util/status 200))
+        (-> (response-util/response {:game-id ""})
+            (response-util/status 404))))
     (catch Throwable e
       (.error log "An error occurred during game get.")
       (.error log e)
       (response-util/status req 500))))
-
 
 (defn delete! [req]
   (try
