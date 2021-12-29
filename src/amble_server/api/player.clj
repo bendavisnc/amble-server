@@ -1,11 +1,16 @@
 (ns amble-server.api.player
   (:require
-    [amble-server.resource.game :as game-resource]
-    [amble-server.resource.player :as player-resource]
-    [ring.util.response :as response-util]
-    [amble-server.utils :as utils]
-    [clojure.java.io :as io]
-    [clojure.edn :as edn]))
+   [amble-server.resource.game :as game-resource]
+   [amble-server.resource.player :as player-resource]
+   [ring.util.response :as response-util]
+   [amble-server.utils :as utils]
+   [clojure.java.io :as io]
+   [clojure.edn :as edn])
+  (:import [org.apache.logging.log4j Logger]
+           [org.apache.logging.log4j LogManager]))
+
+
+(def log (. LogManager getLogger "amble-server.api.player"))
 
 (defn get-all [req]
   (let [game-id (:game-id (:params req))
@@ -15,7 +20,7 @@
             (response-util/status req 404)
             :default
             (response-util/response
-              (player-resource/get-all game-id)))
+             (player-resource/get-all game-id)))
       (catch Throwable e
         (println "An error occurred during game board get.")
         (println e)
@@ -43,10 +48,18 @@
 
 (defn get [req]
   (let [game-id (:game-id (:params req))
-        id (:player-id (:params req))]
+        id (:player-id (:params req))
+        coordinates? (= "true"
+                        (:coordinates (:params req)))]
     (if-let [player-id (player-resource/get game-id, id)]
-      (-> (response-util/response {:player-id player-id})
-          (response-util/status 200))
+      (let [player-get {:player-id player-id}
+            player-get (if coordinates?
+                         (assoc player-get
+                                :coordinates
+                                (crude-player-indexes-map id))
+                         player-get)]
+        (-> (response-util/response player-get)
+            (response-util/status 200)))
       (-> (response-util/response {:player-id ""})
           (response-util/status 404)))))
 
