@@ -56,7 +56,7 @@
                             "\".")))
         game-id (str game-id-prefix (utils/momentary-game-name))]
     (try
-      (assert (not (nil? game-id))
+      (assert (not (empty? game-id))
               "`game-id` is nil.")
       (.info log "Providing game id.")
       (.info log (format "  \"%s\"" game-id))
@@ -72,7 +72,7 @@
       (if-let [game-id (game-resource/get game-id)]
         (-> (response-util/response {:game-id game-id})
             (response-util/status 200))
-        (-> (response-util/response {:game-id ""})
+        (-> (response-util/response {})
             (response-util/status 404))))
     (catch Throwable e
       (.error log "An error occurred during game get.")

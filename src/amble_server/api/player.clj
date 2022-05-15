@@ -48,19 +48,11 @@
 
 (defn get [req]
   (let [game-id (:game-id (:params req))
-        id (:player-id (:params req))
-        coordinates? (= "true"
-                        (:coordinates (:params req)))]
-    (if-let [player-id (player-resource/get game-id, id)]
-      (let [player-get {:player-id player-id}
-            player-get (if coordinates?
-                         (assoc player-get
-                                :coordinates
-                                (crude-player-indexes-map id))
-                         player-get)]
-        (-> (response-util/response player-get)
-            (response-util/status 200)))
-      (-> (response-util/response {:player-id ""})
+        id (:player-id (:params req))]
+    (if-let [_ (player-resource/get game-id, id)]
+      (-> (response-util/response (crude-player-indexes-map id))
+          (response-util/status 200))
+      (-> (response-util/response [])
           (response-util/status 404)))))
 
 ;(response-util/response
