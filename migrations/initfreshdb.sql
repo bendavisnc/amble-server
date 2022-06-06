@@ -11,8 +11,11 @@ CREATE TABLE IF NOT EXISTS "Player" (
 );
 CREATE TABLE IF NOT EXISTS "Move" (
 	"id"	TEXT,
-	"player_id"	TEXT,
 	"game_id"	TEXT,
+	"player_id"	TEXT,
+	"player_piece_index"	TEXT,
+	"x"	TEXT,
+	"y"	TEXT,
 	"move"	TEXT,
 --	FOREIGN KEY("game_id") REFERENCES "Game"("id") ON DELETE CASCADE,
 	PRIMARY KEY("id"),

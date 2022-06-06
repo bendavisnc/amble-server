@@ -15,54 +15,35 @@
 (def log (. LogManager getLogger "amble-server.api.move"))
 
 (defn add!
-  "Returns either a not found, an error, or a successful new move's id."
+  "Returns a new move or an error response."
   [req]
   (try
     (let [game-id (:game-id (:params req))
           player-id (:player-id (:params req))
-          move (json/read-str (request-util/body-string req)
-                              :key-fn keyword)
-          _ (.debug log "move")
-          _ (.debug log move)
-          game-found (game-resource/get game-id)]
-      (cond (not game-found)
-            (response-util/status req 404)
-
-            (or (not game-id)
-                (not player-id))
-            (-> (response-util/response "Missing parameters. \n  \"gameId\" and \"moveId\" are both required.")
-                (response-util/status 400))
-            :default
-            (let [move-id (move-id player-id)
-                  move-id-post-add (move-resource/add! game-id, player-id, move-id, move)
-                  _ (assert (= move-id
-                               move-id-post-add)
-                            (format "Problem with adding player's, \"%s\", move, \"%s\".", player-id, move-id))]
-              (async-resource-move/post-announcement! game-id, player-id, move-id)
-              (-> (response-util/response {:move-id move-id})
-                  (response-util/status 201)))))
+          player-piece-index (:player-piece-index (:params req))
+          {:keys [move]} (json/read-str (request-util/body-string req)
+                                        :key-fn keyword)
+          _ (println "wack")
+          _ (println move)
+          add (move-resource/add! game-id, player-id, player-piece-index, move)
+          move-response-value (move-resource/get game-id, add)]
+      (-> (response-util/response move-response-value) 
+          (response-util/status 201)))
     (catch Throwable e
-      (.error log "An error occurred during game move add.")
+      (.error log "Something bad happened when trying to add a move to the game," "\"" (:game-id (:params req)) "\".")
       (.error log e)
       (response-util/status req 500))))
 
-(defn get [req]
-  (let [game-id (:game-id (:params req))
-        player-id (:player-id (:params req))
-        id (:id (:params req))
-        found (move-resource/get game-id, player-id, id)]
-
-    (try
-      (cond (not found)
-            (response-util/status req 404)
-            :default
-            (response-util/response found))
-      (catch Throwable e
-        (.error log "An error occurred during move get.")
-        (.error log e)
-        (response-util/status req 500)))))
-
-(defn move-id [player-id]
-  (apply str
-         (.encode (Base64/getEncoder)
-                  (.getBytes (str [player-id, (System/currentTimeMillis)])))))
+(defn get 
+  "Returns an existing move or an error response."
+  [req]
+  (try
+    (let [game-id (:game-id (:params req))
+          id (:id (:params req))
+          find (move-resource/get game-id, id)]
+      (-> (response-util/response find) 
+          (response-util/status 201)))
+    (catch Throwable e
+      (.error log "An error occurred during move get.")
+      (.error log e)
+      (response-util/status req 500))))

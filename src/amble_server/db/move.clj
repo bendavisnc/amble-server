@@ -10,19 +10,20 @@
 (def failure ::failure)
 
 (defn add!
-  [game-id, player-id, id, move]
-  (try (let [db-result
-             (move-sql/add! game-id, player-id, id, move)]
-         (if (not (pos? db-result))
+  [game-id, player-id, player-piece-index, move]
+  (try (let [[{:keys [count]}] (move-sql/count game-id)
+             [x, y] (last move)
+             add (move-sql/add! game-id, player-id, player-piece-index, count, (str move), x, y)]
+         (if (not (pos? add))
            {failure (new IllegalStateException (format "Bad db result \"%s\".",
-                                                       db-result))}
-           {success id}))
+                                                       add))}
+           {success count}))
        (catch Throwable e
          {failure e})))
 
-(defn find [game-id, player-id, id]
+(defn find [game-id, id]
   (try (let [found
-             (move-sql/find game-id, player-id, id)]
+             (move-sql/find game-id, id)]
          {success found})
        (catch Throwable e
          {failure e})))
