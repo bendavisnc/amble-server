@@ -2,7 +2,7 @@
   (:require [ring.adapter.jetty9 :as jetty]
             [amble-server.handler :as amble-handler]
             [ring.middleware.reload :as reload]
-            [amble-server.async-resource.core :as async-resource]
+            [amble-server.move-async :as move-async]
             [ring-debug-logging.core :refer [wrap-with-logger]])
   (:import [org.apache.logging.log4j LogManager]))
 
@@ -14,8 +14,8 @@
                    {:port       3000
                     ;:join?      true
                     :daemon?    true
-                    :websockets {async-resource/path
-                                 async-resource/handler-fns}}))
+                    :websockets {move-async/websockets-path
+                                 move-async/handlers}}))
 
 
 
