@@ -20,7 +20,7 @@
 (defn on-update [& args]
   (if (empty? @subscribers)
     (println "No subscribers to update.")
-    (do (println (str "Updating " (count @subscribers) "subscribers."))
+    (do (println (str "Updating " (count @subscribers) " subscriber\\s."))
       (doseq [subscriber @subscribers]
         (subscriber (last args))))))
   

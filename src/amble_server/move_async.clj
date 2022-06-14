@@ -1,5 +1,6 @@
 (ns amble-server.move-async
-  (:require [clojure.core.async :refer [go, go-loop] :as async])
+  (:require [clojure.core.async :refer [go, go-loop] :as async]
+            [ring.adapter.jetty9 :as jetty])
   (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
 
@@ -8,18 +9,25 @@
 
 (def websockets-path "/move/async")
 
+(def subscribers (atom []))
+
 (def latest-move-index-chan (async/chan))
+
+(defn notify-subscribers! [latest-move-index]
+  (doseq [subscriber @subscribers]
+    (subscriber (str latest-move-index))))
 
 ;; Reads from the input chan and notifies subscribers.
 (go-loop []
   (let [latest-move-index (async/<! latest-move-index-chan)]
-    (.info log "Hey neat, need to come back to.")
     (.info log latest-move-index)
+    (notify-subscribers! latest-move-index)
     (recur)))
 
 (defn on-connect [ws & args]
   (.info log "New move async connection!")
   (.debug log args)
+  (swap! subscribers conj (partial jetty/send! ws))
   nil)
 
 (defn on-error [ws & args]
