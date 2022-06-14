@@ -23,8 +23,6 @@
           player-piece-index (:player-piece-index (:params req))
           {:keys [move]} (json/read-str (request-util/body-string req)
                                         :key-fn keyword)
-          _ (println "wack")
-          _ (println move)
           add (move-resource/add! game-id, player-id, player-piece-index, move)
           move-response-value (move-resource/get game-id, add)]
       (-> (response-util/response move-response-value) 
