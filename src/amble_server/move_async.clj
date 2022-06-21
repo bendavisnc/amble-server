@@ -15,7 +15,11 @@
 
 (defn notify-subscribers! [latest-move-index]
   (doseq [subscriber @subscribers]
-    (subscriber (str latest-move-index))))
+    (try
+      (subscriber (str latest-move-index))
+      (catch Exception e
+        (do
+          (.error log "Something bad happened while trying to notify subscriber.", e))))))
 
 ;; Reads from the input chan and notifies subscribers.
 (go-loop []

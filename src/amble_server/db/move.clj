@@ -6,7 +6,7 @@
 
 (def log (. LogManager getLogger "amble-server.db.move"))
 
-(def success ::sucess)
+(def success ::success)
 (def failure ::failure)
 
 (defn add!

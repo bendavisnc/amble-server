@@ -40,7 +40,7 @@
           id (:id (:params req))
           find (move-resource/get game-id, id)]
       (-> (response-util/response find) 
-          (response-util/status 201)))
+          (response-util/status 200)))
     (catch Throwable e
       (.error log "An error occurred during move get.")
       (.error log e)

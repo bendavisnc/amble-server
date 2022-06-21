@@ -16,6 +16,8 @@
 
 (defn get [game-id, id]
   (let [find (move-db/find game-id, id) 
+        _ (println "buttt")
+        _ (println find)
         find-successful? (= move-db/success 
                            (first (keys find)))]
     (if find-successful?

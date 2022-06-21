@@ -15,7 +15,11 @@
   (game-add! {:id id}))
 
 (defn find [id]
-  (game-find-by-id {:id id}))
+  (let [a
+        (game-find-by-id {:id id})]
+    (println "hello")
+    (println a)
+    a))
 
 (defn delete!
   [id]

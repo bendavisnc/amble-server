@@ -4,7 +4,8 @@
    [amble-server.db.move-trigger :as move-trigger]
    [yesql.core :as yesql]
    [clojure.string :as str]
-   [clojure.java.jdbc :as jdbc]))
+   [clojure.java.jdbc :as jdbc]
+   [clojure.walk :as walk]))
 
 (yesql/defquery move-add! "amble_server/db/move.sql" {:connection db/db})
 
@@ -28,13 +29,31 @@
                {:connection tx})))
 
 (defn find [game-id, id]
-  (move-find-by-id {:game_id   game-id
-                    :id        id}
-                   {:identifiers #(str/replace % "_" "-")}))
+  (let [move-raw
+        (move-find-by-id {:game_id   game-id
+                          :id        id})
+
+                        ;;  {:identifiers ;;#(str/replace % "_" "-")
+                                      ;;  #(.replace % \_ \-)})]
+        move
+        (walk/postwalk (fn [x]
+                         (if-let [x-keyword (and (keyword? x)
+                                             x)]
+                           (keyword (str/replace  
+                                                 (name x-keyword)                       
+                                                 "_" 
+                                                 "-")) 
+                           x))
+                       move-raw)]
+    (println "petes sake -??")
+    (println move)
+    (println move-raw)
+    move))
+    
 
 (defn count [game-id]
-  (move-count {:game_id   game-id}
-              {:identifiers #(str/replace % "_" "-")}))
+  (move-count {:game_id   game-id}))
+              ;; {:identifiers #(str/replace % "_" "-")}))
 
 
 
