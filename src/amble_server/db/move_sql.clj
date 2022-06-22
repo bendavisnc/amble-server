@@ -3,6 +3,7 @@
    [amble-server.db.core :as db]
    [amble-server.db.move-trigger :as move-trigger]
    [yesql.core :as yesql]
+   [clojure.edn :as edn]
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
    [clojure.walk :as walk]))
@@ -35,7 +36,7 @@
 
                         ;;  {:identifiers ;;#(str/replace % "_" "-")
                                       ;;  #(.replace % \_ \-)})]
-        move
+        move-key-fix
         (walk/postwalk (fn [x]
                          (if-let [x-keyword (and (keyword? x)
                                              x)]
@@ -44,7 +45,9 @@
                                                  "_" 
                                                  "-")) 
                            x))
-                       move-raw)]
+                       move-raw)
+        move
+        (update move-key-fix :move edn/read-string)]
     move))
     
 

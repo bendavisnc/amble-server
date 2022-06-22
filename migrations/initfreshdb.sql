@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS "Move" (
 	"x"	TEXT,
 	"y"	TEXT,
 	"move"	TEXT,
---	FOREIGN KEY("game_id") REFERENCES "Game"("id") ON DELETE CASCADE,
-	PRIMARY KEY("id"),
-	FOREIGN KEY("game_id", "player_id") REFERENCES "Player"("game_id", "id") ON DELETE CASCADE
+	FOREIGN KEY("game_id") REFERENCES "Game"("id") ON DELETE CASCADE,
+	UNIQUE("id", "game_id")
 );
 COMMIT;
