@@ -30,8 +30,8 @@
 
 (defn find [game-id, id]
   (let [move-raw
-        (move-find-by-id {:game_id   game-id
-                          :id        id})
+        (first (move-find-by-id {:game_id   game-id
+                                 :id        id}))
 
                         ;;  {:identifiers ;;#(str/replace % "_" "-")
                                       ;;  #(.replace % \_ \-)})]
@@ -45,18 +45,8 @@
                                                  "-")) 
                            x))
                        move-raw)]
-    (println "petes sake -??")
-    (println move)
-    (println move-raw)
     move))
     
 
 (defn count [game-id]
   (move-count {:game_id   game-id}))
-              ;; {:identifiers #(str/replace % "_" "-")}))
-
-
-
-  ;; (let [[x, y] (last move)
-        ;; game-move-index (move-count {:game_id game-id})))
- 
