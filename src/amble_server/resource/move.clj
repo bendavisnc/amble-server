@@ -6,8 +6,8 @@
 
 (def log (. LogManager getLogger "amble-server.resource.move"))
 
-(defn add! [game-id, player-id, player-piece-index, move]
-  (let [add (move-db/add! game-id, player-id, player-piece-index, move)
+(defn add! [game-id, player-id, player-piece-index, move, x, y]
+  (let [add (move-db/add! game-id, player-id, player-piece-index, move, x, y)
         add-successful? (= move-db/success 
                            (first (keys add)))]
     (if add-successful?

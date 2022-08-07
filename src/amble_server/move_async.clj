@@ -13,14 +13,25 @@
 
 (def latest-move-index-chan (async/chan))
 
+(defn remove-subscriber! [subscriber]
+  (.info log "Removing subscriber from subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber)
+  (swap! subscribers (fn [subs]
+                       (remove #{subscriber} subs)))
+                      ;;  (filter (fn [s]
+                                ;;  (= subscriber s)
+                              ;;  subs]))
+  (.debug log "Removed subscriber from subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber))
+  ;; (swap! subscribers #(filter (= % subscriber))))
+
 (defn notify-subscribers! [latest-move-index]
   (doseq [subscriber @subscribers]
     (try
       (subscriber (str latest-move-index))
       (catch Exception e
         (do
-          (.error log "Something bad happened while trying to notify subscriber.", e))))))
-
+          (.error log "Something bad happened while trying to notify subscriber.", e)
+          (remove-subscriber! subscriber))))))
+                    
 ;; Reads from the input chan and notifies subscribers.
 (go-loop []
   (let [latest-move-index (async/<! latest-move-index-chan)]
@@ -31,7 +42,11 @@
 (defn on-connect [ws & args]
   (.info log "New move async connection!")
   (.debug log args)
+  (.info log (format "Currently there's %d subscribers."
+                     (count (deref subscribers))))  
   (swap! subscribers conj (partial jetty/send! ws))
+  (.info log (format "Now there's %d subscribers."
+                     (count (deref subscribers))))  
   nil)
 
 (defn on-error [ws & args]
