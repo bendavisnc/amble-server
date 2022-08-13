@@ -16,8 +16,10 @@ CREATE TABLE IF NOT EXISTS "Move" (
 	"player_piece_index"	TEXT,
 	"x"	TEXT,
 	"y"	TEXT,
+	"client_id"	TEXT,
 	"move"	TEXT,
 	FOREIGN KEY("game_id") REFERENCES "Game"("id") ON DELETE CASCADE,
-	UNIQUE("id", "game_id")
+	UNIQUE("id", "game_id"),
+	UNIQUE("client_id", "game_id")
 );
 COMMIT;

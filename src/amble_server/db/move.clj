@@ -10,9 +10,9 @@
 (def failure ::failure)
 
 (defn add!
-  [game-id, player-id, player-piece-index, move, x, y]
+  [game-id, player-id, player-piece-index, move, x, y, client-id]
   (try (let [[{:keys [count]}] (move-sql/count game-id)
-             add (move-sql/add! game-id, player-id, player-piece-index, count, (str move), x, y)]
+             add (move-sql/add! game-id, player-id, player-piece-index, count, (str move), x, y, client-id)]
          (if (not (pos? add))
            {failure (new IllegalStateException (format "Bad db result \"%s\".",
                                                        add))}

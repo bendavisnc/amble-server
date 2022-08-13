@@ -15,16 +15,12 @@
 
 (defn add-subscriber! [subscriber]
   (.info log "Adding subscriber to subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber)
-  (swap! subscribers 
-         (fn [subs]
-           (assoc subs (:subscriber-id subscriber) subscriber)))
+  (swap! subscribers assoc (:subscriber-id subscriber) subscriber)
   (.info log "Added subscriber to subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber))
 
 (defn remove-subscriber! [subscriber]
   (.info log "Removing subscriber from subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber)
-  (swap! subscribers 
-         (fn [subs]
-           (dissoc subs (:subscriber-id subscriber))))
+  (swap! subscribers dissoc (:subscriber-id subscriber))
   (.debug log "Removed subscriber from subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber))
   ;; (swap! subscribers #(filter (= % subscriber))))
 

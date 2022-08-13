@@ -16,7 +16,7 @@
 
 (yesql/defquery move-count "amble_server/db/move.sql" {:connection db/db})
 
-(defn add! [game-id, player-id, player-piece-index, id, move, x, y]
+(defn add! [game-id, player-id, player-piece-index, id, move, x, y, client-id]
   (jdbc/with-db-transaction [tx db/db]
     (.addUpdateListener (:connection tx)
                         move-trigger/listener)
@@ -26,7 +26,8 @@
                 :id id
                 :move      move
                 :x x
-                :y y}
+                :y y
+                :client_id client-id} 
                {:connection tx})))
 
 (defn find [game-id, id]

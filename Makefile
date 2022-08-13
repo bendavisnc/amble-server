@@ -13,3 +13,6 @@ clean:
 runtests:
 	echo 'Running amble server tests'; \
 	lein auto test;
+
+rerundevserver: 
+	lein run
