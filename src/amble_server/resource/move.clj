@@ -16,11 +16,20 @@
 
 (defn get [game-id, id]
   (let [find (move-db/find game-id, id) 
-        _ (println "buttt")
-        _ (println find)
         find-successful? (= move-db/success 
-                           (first (keys find)))]
+                            (first (keys find)))]
     (if find-successful?
       (move-db/success find)
       (throw (new Exception (str find))))))
+
+(defn get-by-rowid [rowid]
+  (let [
+        find (move-db/find-by-rowid rowid) 
+        ;; find (move-db/find "TheSaturdayGame" 0) 
+        find-successful? (= move-db/success 
+                            (first (keys find)))]
+    (if find-successful?
+      (move-db/success find)
+      (throw (new Exception (str find))))))
+
 

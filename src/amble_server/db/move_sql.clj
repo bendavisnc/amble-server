@@ -6,11 +6,18 @@
    [clojure.edn :as edn]
    [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [clojure.walk :as walk]))
+   [clojure.walk :as walk])
+  (:import
+    [org.apache.logging.log4j LogManager]))
+
+
+(def log (. LogManager getLogger "amble-server.db.move-sql"))
 
 (yesql/defquery move-add! "amble_server/db/move.sql" {:connection db/db})
 
 (yesql/defquery move-find-by-id "amble_server/db/move.sql" {:connection db/db})
+
+(yesql/defquery move-find-by-rowid "amble_server/db/move.sql" {:connection db/db})
 
 (yesql/defquery move-find-by-game-id "amble_server/db/move.sql" {:connection db/db})
 
@@ -30,13 +37,8 @@
                 :client_id client-id} 
                {:connection tx})))
 
-(defn find [game-id, id]
-  (let [move-raw
-        (first (move-find-by-id {:game_id   game-id
-                                 :id        id}))
-
-                        ;;  {:identifiers ;;#(str/replace % "_" "-")
-                                      ;;  #(.replace % \_ \-)})]
+(defn move-postfind [move-raw]
+  (let [
         move-key-fix
         (walk/postwalk (fn [x]
                          (if-let [x-keyword (and (keyword? x)
@@ -50,7 +52,18 @@
         move
         (update move-key-fix :move edn/read-string)]
     move))
-    
+
+(defn find [game-id, id]
+  (if-let [move-raw
+           (first (move-find-by-id {:game_id   game-id
+                                    :id        id}))]
+    (move-postfind move-raw)))
+
+(defn find-by-rowid [rowid]
+  (if-let [move-raw
+           (first (move-find-by-rowid {:rowid rowid}))]
+    (move-postfind move-raw)))
+   
 
 (defn count [game-id]
   (move-count {:game_id   game-id}))

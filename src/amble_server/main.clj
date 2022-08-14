@@ -11,7 +11,8 @@
 (def log (. LogManager getLogger "amble-server.main"))
 
 (defn -main [& args]
-  (let [latest-move-index-chan (async/chan)]
+  (let [_ (.info log "Setting up amble server.")
+        latest-move-index-chan (async/chan)]
     (move-trigger/init! (fn [latest-move-index] 
                           (async/put! latest-move-index-chan
                                       latest-move-index))) 

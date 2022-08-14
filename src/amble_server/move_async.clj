@@ -1,6 +1,7 @@
 (ns amble-server.move-async
   (:require [clojure.core.async :refer [go, go-loop] :as async]
-            [ring.adapter.jetty9 :as jetty])
+            [ring.adapter.jetty9 :as jetty]
+            [amble-server.resource.move :as move-resource])
   (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
 
@@ -25,6 +26,11 @@
   ;; (swap! subscribers #(filter (= % subscriber))))
 
 (defn notify-subscribers! [latest-move-index]
+  (let [
+        move-latest (move-resource/get-by-rowid latest-move-index)  
+        _ (println "whatup guys")]
+    (.info log "neat guys")
+    (.info log move-latest))
   (doseq [subscriber-key (keys (deref subscribers))]
     (try
       (.info log "Updating " (count (deref subscribers)) " subscribers.")
@@ -35,7 +41,7 @@
         (do
           (.error log "Something bad happened while trying to notify subscriber.", e)
           (when-let [subscriber-to-remove ((deref subscribers))]
-                                           subscriber-key 
+                    subscriber-key 
             (remove-subscriber! subscriber-to-remove)))))))   
 
 (defn subscriber 
@@ -50,6 +56,8 @@
 
 (defn on-connect [ws & args]
   (.info log "New move async connection!")
+  (.info log ws)
+  (.info log args)
   (add-subscriber! (subscriber ws))
   nil)
 
@@ -76,6 +84,8 @@
 ;; Reads from the input chan and notifies subscribers.
 (go-loop []
   (let [latest-move-index (async/<! latest-move-index-chan)]
+    (.info log (str "Posting latest move index, "
+                    latest-move-index))
     (.info log latest-move-index)
     (notify-subscribers! latest-move-index)
     (recur)))

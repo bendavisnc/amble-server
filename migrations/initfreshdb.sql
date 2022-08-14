@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS "Player" (
 	UNIQUE("id", "game_id")
 );
 CREATE TABLE IF NOT EXISTS "Move" (
+	"rowid"	INTEGER PRIMARY KEY,
 	"id"	TEXT,
 	"game_id"	TEXT,
 	"player_id"	TEXT,
