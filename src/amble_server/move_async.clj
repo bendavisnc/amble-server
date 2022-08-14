@@ -3,7 +3,8 @@
             [ring.adapter.jetty9 :as jetty]
             [amble-server.resource.move :as move-resource])
   (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager]))
+           [org.apache.logging.log4j LogManager]
+           [java.lang Exception]))
 
 
 (def log (. LogManager getLogger "amble-server.move-async"))
@@ -15,50 +16,57 @@
 (def latest-move-index-chan (async/chan))
 
 (defn add-subscriber! [subscriber]
-  (.info log "Adding subscriber to subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber)
-  (swap! subscribers assoc (:subscriber-id subscriber) subscriber)
-  (.info log "Added subscriber to subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber))
+  (.info log (str "Adding subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) "."))
+  (swap! subscribers assoc-in [(:game-id subscriber) (:subscriber-id subscriber)] 
+                              subscriber)
+  (.info log (str "Added subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) ".")))
 
 (defn remove-subscriber! [subscriber]
-  (.info log "Removing subscriber from subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber)
-  (swap! subscribers dissoc (:subscriber-id subscriber))
-  (.debug log "Removed subscriber from subscribers (count, '{}'), '{}'", (count (deref subscribers)) subscriber))
+  (.info log (str "Removing subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) "."))
+  ;; (swap! subscribers dissoc (:subscriber-id subscriber))
+  ;; (update-in {:a {:b 0 :c 1}} [:a] dissoc :b)
+  (swap! subscribers update-in [(:game-id subscriber)] dissoc (:subscriber-id subscriber))
+  (.info log (str "Removed subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) ".")))
   ;; (swap! subscribers #(filter (= % subscriber))))
 
 (defn notify-subscribers! [latest-move-index]
   (let [
         move-latest (move-resource/get-by-rowid latest-move-index)  
-        _ (println "whatup guys")]
-    (.info log "neat guys")
-    (.info log move-latest))
-  (doseq [subscriber-key (keys (deref subscribers))]
-    (try
-      (.info log "Updating " (count (deref subscribers)) " subscribers.")
-      (let [{:keys [update-subscriber!]} ((deref subscribers)
-                                          subscriber-key)]
-        (update-subscriber! (str latest-move-index)))
-      (catch Exception e
-        (do
-          (.error log "Something bad happened while trying to notify subscriber.", e)
-          (when-let [subscriber-to-remove ((deref subscribers))]
-                    subscriber-key 
-            (remove-subscriber! subscriber-to-remove)))))))   
+        game-id (keyword (:game-id move-latest))
+        move-game-subscribers (game-id (deref subscribers))]
+    (doseq [subscriber-key (keys move-game-subscribers)]
+      (try
+        (.info log (str "Updating " (count move-game-subscribers) " subscribers, game, \"" game-id "\"."))
+        (let [{:keys [update-subscriber!]} (move-game-subscribers
+                                            subscriber-key)]
+          (update-subscriber! (str (:id move-latest))))
+        (catch Exception e
+          (do
+            (.error log "Something bad happened while trying to notify subscriber.", e)
+            (when-let [subscriber-to-remove (move-game-subscribers
+                                             subscriber-key)] 
+              (remove-subscriber! subscriber-to-remove))))))))
 
 (defn subscriber 
-  "Creates a subscriber instance.
-   Its input should be the value that the client cares about as notification input,
-   currently the number index of the latest move made."
-  [ws]
-  {:subscriber-id 
+  "Creates a subscriber instance."
+  [ws, game-id]
+  {:game-id game-id
+   :subscriber-id 
    (.hashCode ws)
    :update-subscriber!
    (partial jetty/send! ws)})
 
+(defn game-id [ws]
+  (keyword (first (.get (.getParameterMap (.getUpgradeRequest (.getSession ws)))
+                        "game-id"))))
+
 (defn on-connect [ws & args]
   (.info log "New move async connection!")
-  (.info log ws)
-  (.info log args)
-  (add-subscriber! (subscriber ws))
+  (.info log (type ws))
+  (if-let [game-id-from-query-param
+           (game-id ws)]
+    (add-subscriber! (subscriber ws game-id-from-query-param))
+    (throw (new Exception "No game id available at start of websockets connection.")))
   nil)
 
 (defn on-error [ws & args]
@@ -68,10 +76,37 @@
 
 (defn on-close [ws & args]
   (.info log "Existing async channel to close.")
-  (when-let [subscriber-to-remove 
-             ((deref subscribers)
-              (.hashCode ws))]
-    (remove-subscriber! subscriber-to-remove))   
+  (let [
+        ;; _ (.info log (nil? (.getSession ws)))
+        ;; _ (.info log ws)
+        ;; _ (.info log (.getSession ws))
+        ;; _ (.info log (.getUpgradeRequest (.getSession ws)))
+        ;; _ (.info log (.getParameterMap (.getUpgradeRequest (.getSession ws))))
+        ;; game-id (game-id ws)
+        ;; _ (.info log game-id)
+        ;; subscribers-by-game-id
+        ;; ((deref subscribers)
+        ;;  (game-id ws))
+        ;; _ (.info log subscribers-by-game-id)
+        ;; subscriber-by-ws
+        ;; (subscribers-by-game-id
+        ;;  (.hashCode ws))
+        ;; _ (.info log subscriber-by-ws)]
+        subscribers-all (mapcat (fn [[_ subscribers-by-game-id]]
+                                  (.info log "also wtf")
+                                  (.info log subscribers-by-game-id)
+                                  (vals subscribers-by-game-id))
+                                (deref subscribers))   
+        _ (.info log "wuf")
+        _ (.info log subscribers-all)
+        _ (.info log (vec subscribers-all))
+        subscriber-one
+        (first (filter (fn [s]                         
+                         (= (:subscriber-id s)
+                            (.hashCode ws)))
+                       subscribers-all))]      
+    (when-let [subscriber-to-remove subscriber-one]
+      (remove-subscriber! subscriber-to-remove)))   
   nil)
 
 

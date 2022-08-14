@@ -25,7 +25,7 @@
     (println "No subscribers to update.")
     (do (println (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
         (doseq [subscriber @subscribers]
-          (let [move-id (dec (last args))]
+          (let [move-id (last args)]
             (subscriber move-id))))))
 
 (def listener
