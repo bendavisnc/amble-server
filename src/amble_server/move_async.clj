@@ -30,28 +30,40 @@
   ;; (swap! subscribers #(filter (= % subscriber))))
 
 (defn notify-subscribers! [latest-move-index]
-  (let [
-        move-latest (move-resource/get-by-rowid latest-move-index)  
-        game-id (keyword (:game-id move-latest))
-        move-game-subscribers (game-id (deref subscribers))]
-    (doseq [subscriber-key (keys move-game-subscribers)]
-      (try
-        (.info log (str "Updating " (count move-game-subscribers) " subscribers, game, \"" game-id "\"."))
-        (let [{:keys [update-subscriber!]} (move-game-subscribers
-                                            subscriber-key)]
-          (update-subscriber! (str (:id move-latest))))
-        (catch Exception e
-          (do
-            (.error log "Something bad happened while trying to notify subscriber.", e)
-            (when-let [subscriber-to-remove (move-game-subscribers
-                                             subscriber-key)] 
-              (remove-subscriber! subscriber-to-remove))))))))
+  (try
+    (let [_ (Thread/sleep 250) ;; todo, remove this line and figure out a way to ensure that the db transaction is successful already.
+          move-latest (move-resource/get-by-rowid latest-move-index)
+          _ (assert (not (nil? move-latest))
+                    (str "move-latest is null, \"" move-latest "\"."))
+
+          _ (.info log move-latest)
+          game-id (keyword (:game-id move-latest))
+          _ (assert (not (nil? game-id))
+                    (str "game-id is null, \"" game-id "\"."))
+          move-game-subscribers (game-id (deref subscribers))]
+
+      (assert (not (empty? move-game-subscribers))
+              (str "Move game subscribers is empty, \"" move-game-subscribers "\"."))
+      (doseq [subscriber-key (keys move-game-subscribers)]
+        (try
+          (.info log (str "Updating " (count move-game-subscribers) " subscribers, game, \"" (name game-id) "\"."))
+          (let [{:keys [update-subscriber!]} (move-game-subscribers
+                                              subscriber-key)]
+            (update-subscriber! (str (:id move-latest))))
+          (catch Exception e
+            (do
+              (.error log "Something bad happened while trying to notify subscriber.", e)
+              (when-let [subscriber-to-remove (move-game-subscribers
+                                               subscriber-key)] 
+                (remove-subscriber! subscriber-to-remove)))))))
+    (catch Throwable e
+      (.error log "Something bad happened while trying to notify subscribers.", e))))
 
 (defn subscriber 
   "Creates a subscriber instance."
   [ws, game-id]
   {:game-id game-id
-   :subscriber-id 
+                                                               :subscriber-id 
    (.hashCode ws)
    :update-subscriber!
    (partial jetty/send! ws)})
@@ -62,7 +74,6 @@
 
 (defn on-connect [ws & args]
   (.info log "New move async connection!")
-  (.info log (type ws))
   (if-let [game-id-from-query-param
            (game-id ws)]
     (add-subscriber! (subscriber ws game-id-from-query-param))
@@ -76,37 +87,17 @@
 
 (defn on-close [ws & args]
   (.info log "Existing async channel to close.")
-  (let [
-        ;; _ (.info log (nil? (.getSession ws)))
-        ;; _ (.info log ws)
-        ;; _ (.info log (.getSession ws))
-        ;; _ (.info log (.getUpgradeRequest (.getSession ws)))
-        ;; _ (.info log (.getParameterMap (.getUpgradeRequest (.getSession ws))))
-        ;; game-id (game-id ws)
-        ;; _ (.info log game-id)
-        ;; subscribers-by-game-id
-        ;; ((deref subscribers)
-        ;;  (game-id ws))
-        ;; _ (.info log subscribers-by-game-id)
-        ;; subscriber-by-ws
-        ;; (subscribers-by-game-id
-        ;;  (.hashCode ws))
-        ;; _ (.info log subscriber-by-ws)]
-        subscribers-all (mapcat (fn [[_ subscribers-by-game-id]]
-                                  (.info log "also wtf")
-                                  (.info log subscribers-by-game-id)
+  (let [subscribers-all (mapcat (fn [[_ subscribers-by-game-id]]
                                   (vals subscribers-by-game-id))
                                 (deref subscribers))   
-        _ (.info log "wuf")
-        _ (.info log subscribers-all)
-        _ (.info log (vec subscribers-all))
-        subscriber-one
+        subscriber-to-remove
         (first (filter (fn [s]                         
                          (= (:subscriber-id s)
                             (.hashCode ws)))
                        subscribers-all))]      
-    (when-let [subscriber-to-remove subscriber-one]
-      (remove-subscriber! subscriber-to-remove)))   
+    (if-let [subscriber subscriber-to-remove]
+      (remove-subscriber! subscriber)   
+      (.debug log (str "Can't find subscriber by id, \"" (.hashCode ws) "\", at close."))))
   nil)
 
 

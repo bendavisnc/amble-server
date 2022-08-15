@@ -38,15 +38,8 @@
   (let [game-id (:game-id (:params req))
         id (:id (:params req))]
     (if-let [move-existing (move-resource/get game-id, id)]
-      (do
-        (.info log (str "move existing, \n"
-                        move-existing))
-        (.info log (type move-existing))
-        (.info log move-existing)
-        (.info log "wtf is going on")
-        (.info log (move-resource/get game-id, id))
-        (-> (response-util/response move-existing)
-            (response-util/status 200)))
+      (-> (response-util/response move-existing)
+          (response-util/status 200))
       (-> (response-util/response [])
           (response-util/status 404)))))
 

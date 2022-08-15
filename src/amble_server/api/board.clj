@@ -23,7 +23,7 @@
             (response-util/response
               (edn/read-string (slurp (io/resource "board.json")))))
       (catch Throwable e
-        (.info log "An error occurred during game board get.")
-        (println e)
+        (.error log "An error occurred during game board get.")
+        (.error log e)
         (response-util/status req 500)))))
 

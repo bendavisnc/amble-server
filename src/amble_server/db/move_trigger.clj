@@ -19,11 +19,9 @@
 (def subscribers (atom []))
 
 (defn on-update [& args]
-  (.info log "@ move-trigger, on-updatez")
-  (.info log args)
   (if (empty? @subscribers)
-    (println "No subscribers to update.")
-    (do (println (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
+    (.info log "No subscribers to update.")
+    (do (.info log (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
         (doseq [subscriber @subscribers]
           (let [move-id (last args)]
             (subscriber move-id))))))

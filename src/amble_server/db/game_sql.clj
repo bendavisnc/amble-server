@@ -17,8 +17,6 @@
 (defn find [id]
   (let [a
         (game-find-by-id {:id id})]
-    (println "hello")
-    (println a)
     a))
 
 (defn delete!

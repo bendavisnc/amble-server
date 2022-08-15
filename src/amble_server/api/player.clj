@@ -22,8 +22,8 @@
             (response-util/response
              (player-resource/get-all game-id)))
       (catch Throwable e
-        (println "An error occurred during game board get.")
-        (println e)
+        (.error log "An error occurred during game board get.")
+        (.error log e)
         (response-util/status req 500)))))
 
 (defn crude-player-indexes-map [player-id]

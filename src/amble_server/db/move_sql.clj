@@ -62,11 +62,7 @@
 (defn find-by-rowid [rowid]
   (if-let [move-raw
            (first (move-find-by-rowid {:rowid rowid}))]
-    (let [
-          _ (.info log "gucccccccccccccci now?????????")
-          _ (.info log (type rowid))
-          _ (.info log move-raw)]
-      (move-postfind move-raw))))
+    (move-postfind move-raw)))
    
 
 (defn count [game-id]
