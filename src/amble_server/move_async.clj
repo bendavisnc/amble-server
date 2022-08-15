@@ -15,6 +15,18 @@
 
 (def latest-move-index-chan (async/chan))
 
+(defn move-latest-with-retry [rowid]
+  (let [move (move-resource/get-by-rowid rowid)]
+    (if (nil? move)
+      (let [_ (.debug log "Encountered problem with retrieving move for async sending out. \n Trying again one more time in less than a second.")
+            _ (Thread/sleep 250)
+            move-second-go (move-resource/get-by-rowid rowid)]
+        (if (nil? move-second-go)
+          (throw (new Exception (str "Can't get lastest move with rowid, \"" rowid "\" after retry attempt.")))
+          move-second-go))
+      move)))
+
+
 (defn add-subscriber! [subscriber]
   (.info log (str "Adding subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) "."))
   (swap! subscribers assoc-in [(:game-id subscriber) (:subscriber-id subscriber)] 
@@ -32,7 +44,7 @@
 (defn notify-subscribers! [latest-move-index]
   (try
     (let [_ (Thread/sleep 250) ;; todo, remove this line and figure out a way to ensure that the db transaction is successful already.
-          move-latest (move-resource/get-by-rowid latest-move-index)
+          move-latest (move-latest-with-retry latest-move-index)
           _ (assert (not (nil? move-latest))
                     (str "move-latest is null, \"" move-latest "\"."))
 
