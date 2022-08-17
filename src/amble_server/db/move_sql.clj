@@ -17,6 +17,8 @@
 
 (yesql/defquery move-find-by-id "amble_server/db/move.sql" {:connection db/db})
 
+(yesql/defquery move-find-by-player-id "amble_server/db/move.sql" {:connection db/db})
+
 (yesql/defquery move-find-by-rowid "amble_server/db/move.sql" {:connection db/db})
 
 (yesql/defquery move-find-by-game-id "amble_server/db/move.sql" {:connection db/db})
@@ -58,6 +60,17 @@
            (first (move-find-by-id {:game_id   game-id
                                     :id        id}))]
     (move-postfind move-raw)))
+
+(defn find-by-player-id [game-id, player-id]
+  (if-let [moves-raw
+           (move-find-by-player-id {:game_id (name game-id), 
+                                    :player_id (name player-id)})]
+    (do
+      (.info log "wtfff")
+      (.info log (vector game-id, player-id))
+      (.info log (vec moves-raw))
+      (map move-postfind        
+           moves-raw))))
 
 (defn find-by-rowid [rowid]
   (if-let [move-raw

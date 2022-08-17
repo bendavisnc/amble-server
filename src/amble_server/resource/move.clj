@@ -32,4 +32,15 @@
       (move-db/success find)
       (throw (new Exception (str find))))))
 
+(defn get-by-player-id [game-id, player-id]
+  (let [
+        find (move-db/find-by-player-id game-id, player-id) 
+        ;; find (move-db/find "TheSaturdayGame" 0) 
+        find-successful? (= move-db/success 
+                            (first (keys find)))]
+    (if find-successful?
+      (move-db/success find)
+      (throw (new Exception (str find))))))
+
+
 

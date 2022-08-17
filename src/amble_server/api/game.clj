@@ -21,7 +21,7 @@
               (.info log (str "Using game id prefix value, \""
                               game-id-prefix
                               "\".")))
-          game-id (str game-id-prefix (utils/momentary-game-name))
+          game-id (keyword (str game-id-prefix (utils/momentary-game-name)))
           already-existing-game-id (game-resource/get game-id)]
       (if (not (nil? already-existing-game-id))
         (-> (response-util/response "Conflict.")
@@ -31,9 +31,10 @@
               _ (assert (not (nil? was-game-created))
                         "Problem creating game.")
               players-created (doall (map (fn [i]
-                                            (player-resource/add! game-id (str "player-"
-                                                                               (nth ["one", "two", "three", "four", "five", "six"]
-                                                                                    i))))
+                                            (player-resource/add! game-id 
+                                                                  (keyword (str "player-"
+                                                                                (nth ["one", "two", "three", "four", "five", "six"]
+                                                                                     i)))))
                                           (range 6)))
               _ (doall (map (fn [write-result]
                               (assert (not (nil? write-result))
@@ -68,7 +69,7 @@
 
 (defn get [req]
   (try
-    (let [game-id (:game-id (:params req))]
+    (let [game-id (keyword (:game-id (:params req)))]
       (if-let [game-id (game-resource/get game-id)]
         (-> (response-util/response {:game-id game-id})
             (response-util/status 200))
@@ -81,7 +82,7 @@
 
 (defn delete! [req]
   (try
-    (let [game-id (:game-id (:params req))
+    (let [game-id (keyword (:game-id (:params req)))
           no-game-id ""
           already-existing-game-id (game-resource/get game-id)]
       (cond (not already-existing-game-id)

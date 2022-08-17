@@ -13,7 +13,7 @@
 (defn get
   "Returns either a not found, an error, or a constant value'd response representing the piece coordinates of a chinese checkers set."
   [req]
-  (let [game-id (:game-id (:params req))
+  (let [game-id (keyword (:game-id (:params req)))
         found (game-resource/get game-id)]
     (try
       (cond (not found)

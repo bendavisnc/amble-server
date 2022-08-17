@@ -6,11 +6,8 @@
    [ring.util.response :as response-util]
    [ring.util.request :as request-util]
    [clojure.data.json :as json])
-  (:import [java.util Base64]
-           [org.apache.logging.log4j Logger]
+  (:import [org.apache.logging.log4j Logger]
            [org.apache.logging.log4j LogManager]))
-
-(declare move-id)
 
 (def log (. LogManager getLogger "amble-server.api.move"))
 
@@ -33,14 +30,19 @@
       (response-util/status req 500))))
 
 (defn get
-  "Returns an existing move or an error response."
+  "Returns either an existing move, or a not found response, or an error response."
   [req]
-  (let [game-id (:game-id (:params req))
-        id (:id (:params req))]
-    (if-let [move-existing (move-resource/get game-id, id)]
-      (-> (response-util/response move-existing)
-          (response-util/status 200))
-      (-> (response-util/response [])
-          (response-util/status 404)))))
+  (try
+    (let [game-id (:game-id (:params req))
+          id (:id (:params req))]
+      (if-let [move-existing (move-resource/get game-id, id)]
+        (-> (response-util/response move-existing)
+            (response-util/status 200))
+        (-> (response-util/response [])
+            (response-util/status 404))))
+    (catch Throwable e
+      (.error log "Something bad happened when trying to add a move to the game," "\"" (:game-id (:params req)) "\".")
+      (.error log e)
+      (response-util/status req 500))))
 
 ;

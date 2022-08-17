@@ -28,8 +28,12 @@
                (throw (new RuntimeException db-result)))))))
 
 (defn get [id]
+  (assert (keyword? id)
+          (str "Bad id value provided during get, \"" id "\"."))
   (let [db-result (game-db/find id)
         nil-result-value nil]
+    (.info log "what in the world")
+    (.info log db-result)
     (cond
       (game-db/failure db-result)
       (do

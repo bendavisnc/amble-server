@@ -92,24 +92,32 @@
     (throw (new Exception "No game id available at start of websockets connection.")))
   nil)
 
-(defn on-error [ws & args]
-  (.info log "New move async error")
-  (.debug log args)
-  nil)
+(defn find-subscriber-by-id [subscriber-id]
+  (let [subscribers-all (mapcat (fn [[_ subscribers-by-game-id]]
+                                    (vals subscribers-by-game-id))
+                                (deref subscribers))   
+        subscriber-found
+        (first (filter (fn [s]                         
+                         (= (:subscriber-id s)
+                            subscriber-id)) 
+                       subscribers-all))]      
+    (if-let [subscriber subscriber-found]
+      subscriber   
+      (do (.debug log (str "Can't find subscriber by id, \"" subscriber-id "\"."))
+          nil))))
 
 (defn on-close [ws & args]
   (.info log "Existing async channel to close.")
-  (let [subscribers-all (mapcat (fn [[_ subscribers-by-game-id]]
-                                  (vals subscribers-by-game-id))
-                                (deref subscribers))   
-        subscriber-to-remove
-        (first (filter (fn [s]                         
-                         (= (:subscriber-id s)
-                            (.hashCode ws)))
-                       subscribers-all))]      
-    (if-let [subscriber subscriber-to-remove]
-      (remove-subscriber! subscriber)   
-      (.debug log (str "Can't find subscriber by id, \"" (.hashCode ws) "\", at close."))))
+  (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
+    (remove-subscriber! subscriber-to-remove)   
+    (.debug log (str "No subscriber found to remove at close.")))
+  nil)
+
+(defn on-error [ws & args]
+  (.error log (str "Encountered new async error. \n" (vec args)))
+  (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
+    (remove-subscriber! subscriber-to-remove)   
+    (.debug log (str "No subscriber found to remove at error")))
   nil)
 
 

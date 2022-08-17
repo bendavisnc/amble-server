@@ -34,5 +34,11 @@
        (catch Throwable e
          {failure e})))
 
+(defn find-by-player-id [game-id, player-id]
+  (try (let [found
+             (move-sql/find-by-player-id game-id, player-id)]
+         {success found})
+       (catch Throwable e
+         {failure e})))
 
 
