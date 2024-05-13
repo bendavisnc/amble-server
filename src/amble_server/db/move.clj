@@ -20,6 +20,17 @@
        (catch Throwable e
          {failure e})))
 
+(defn delete!
+  "Deletes the move with the given game id."
+  [game-id, id]
+  (try (let [row-delete-count (move-sql/delete! game-id, id)]
+         (when (not (= 1 row-delete-count))
+           (throw (new IllegalStateException (format "Bad db result \"%s\"."
+                                                     row-delete-count))))
+         {success (keyword id)})
+       (catch Throwable e
+         {failure e})))
+
 (defn find [game-id, id]
   (try (let [found
              (move-sql/find game-id, id)]

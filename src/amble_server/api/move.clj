@@ -59,3 +59,16 @@
       (.error log e)
       (response-util/status req 500))))
 
+(defn delete!
+  "Deletes a move or returns an error response."
+  [req]
+  (try
+    (let [game-id (:game-id (:params req))
+          id (:id (:params req))
+          _ (move-resource/delete! game-id, id)]
+       (response-util/response nil)) 
+    (catch Throwable e
+      (.error log "Something bad happened when trying to delete a move from the game," "\"" (:game-id (:params req)) "\".")
+      (.error log e)
+      (response-util/status req 500))))
+

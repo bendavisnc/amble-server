@@ -38,6 +38,7 @@
            (GET "/game/:game-id/move" [] move-api/get-all)
            (OPTIONS "/game/:game-id/player/:player-id/move" [] "")
            (DELETE "/game/:game-id" [] game-api/delete!)
+           (DELETE "/game/:game-id/move/:id" [] move-api/delete!)
            (route/not-found "Not Found"))
 
 (def app (middleware-json/wrap-json-response

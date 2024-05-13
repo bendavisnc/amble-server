@@ -14,6 +14,14 @@
       (move-db/success add)
       (throw (new Exception (str add))))))
 
+(defn delete! [game-id, id]
+  (let [delete (move-db/delete! game-id, id)
+        delete-successful? (= move-db/success 
+                           (first (keys delete)))]
+    (if delete-successful?
+      (move-db/success delete)
+      (throw (new Exception (str delete))))))
+
 (defn get [game-id, id]
   (let [find (move-db/find game-id, id) 
         find-successful? (= move-db/success 

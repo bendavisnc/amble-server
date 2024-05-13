@@ -8,6 +8,9 @@ select * from move where "game_id" = :game_id and "player_id" = :player_id
 -- name: move-find-by-game-id
 select * from move where "game_id" = :game_id
 
+-- name: move-delete-by-id!
+delete from move where "game_id" = :game_id and "id" = :id
+
 -- name: move-find-by-id
 select * from move where "game_id" = :game_id and id = :id
 

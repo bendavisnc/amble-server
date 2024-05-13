@@ -15,6 +15,8 @@
 
 (yesql/defquery move-add! "amble_server/db/move.sql" {:connection db/db})
 
+(yesql/defquery move-delete-by-id! "amble_server/db/move.sql" {:connection db/db})
+
 (yesql/defquery move-find-by-id "amble_server/db/move.sql" {:connection db/db})
 
 (yesql/defquery move-find-by-player-id "amble_server/db/move.sql" {:connection db/db})
@@ -38,6 +40,11 @@
                 :y y
                 :client_id client-id} 
                {:connection tx})))
+
+(defn delete! [game-id, id]
+  (move-delete-by-id! {:game_id (name game-id), 
+                       :id (name id)}))
+
 
 (defn move-postfind [move-raw]
   (let [
