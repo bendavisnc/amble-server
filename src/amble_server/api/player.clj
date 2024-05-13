@@ -19,7 +19,7 @@
     (try
       (cond (not game-found)
             (response-util/status req 404)
-            true 
+            :else 
             (response-util/response
              (player-resource/get-all game-id)))
       (catch Throwable e

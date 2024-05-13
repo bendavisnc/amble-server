@@ -11,6 +11,36 @@
 
 (def log (. LogManager getLogger "amble-server.api.move"))
 
+(defn get
+  "Returns either an existing move, or a not found response, or an error response."
+  [req]
+  (try
+    (let [game-id (:game-id (:params req))
+          id (:id (:params req))]
+      (if-let [move-existing (move-resource/get game-id, id)]
+        (-> (response-util/response move-existing)
+            (response-util/status 200))
+        (-> (response-util/response [])
+            (response-util/status 404))))
+    (catch Throwable e
+      (.error log "Something bad happened when trying to add a move to the game," "\"" (:game-id (:params req)) "\".")
+      (.error log e)
+      (response-util/status req 500))))
+
+(defn get-all [req]
+  (let [game-id (keyword (:game-id (:params req)))
+        game-found (game-resource/get game-id)]
+    (try
+      (cond (not game-found)
+            (response-util/status req 404)
+            :else 
+            (response-util/response
+             (move-resource/get-all game-id)))
+      (catch Throwable e
+        (.error log "An error occurred during game move get all.")
+        (.error log e)
+        (response-util/status req 500)))))
+
 (defn add!
   "Returns a new move or an error response."
   [req]
@@ -29,20 +59,3 @@
       (.error log e)
       (response-util/status req 500))))
 
-(defn get
-  "Returns either an existing move, or a not found response, or an error response."
-  [req]
-  (try
-    (let [game-id (:game-id (:params req))
-          id (:id (:params req))]
-      (if-let [move-existing (move-resource/get game-id, id)]
-        (-> (response-util/response move-existing)
-            (response-util/status 200))
-        (-> (response-util/response [])
-            (response-util/status 404))))
-    (catch Throwable e
-      (.error log "Something bad happened when trying to add a move to the game," "\"" (:game-id (:params req)) "\".")
-      (.error log e)
-      (response-util/status req 500))))
-
-;

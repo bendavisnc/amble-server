@@ -65,12 +65,16 @@
   (if-let [moves-raw
            (move-find-by-player-id {:game_id (name game-id), 
                                     :player_id (name player-id)})]
-    (do
-      (.info log "wtfff")
-      (.info log (vector game-id, player-id))
-      (.info log (vec moves-raw))
-      (map move-postfind        
-           moves-raw))))
+    (map move-postfind        
+         moves-raw)))
+
+(defn find-by-game-id [game-id]
+  (if-let [moves-raw
+           (move-find-by-game-id {:game_id (name game-id)})]
+    (map :id
+         (map move-postfind        
+              moves-raw))))
+         
 
 (defn find-by-rowid [rowid]
   (if-let [move-raw
