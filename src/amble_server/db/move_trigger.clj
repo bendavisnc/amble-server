@@ -22,9 +22,9 @@
   (if (empty? @subscribers)
     (.info log "No subscribers to update.")
     (do (.info log (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
-        (doseq [subscriber @subscribers]
-          (let [move-id (last args)]
-            (subscriber move-id))))))
+        (let [rowid (last args)]
+          (doseq [subscriber @subscribers]
+            (subscriber rowid))))))
 
 (def listener
   (reify SQLiteUpdateListener

@@ -8,7 +8,7 @@
    [clojure.java.jdbc :as jdbc]
    [clojure.walk :as walk])
   (:import
-    [org.apache.logging.log4j LogManager]))
+   [org.apache.logging.log4j LogManager]))
 
 
 (def log (. LogManager getLogger "amble-server.db.move-sql"))
@@ -36,26 +36,30 @@
                 :player_piece_index player-piece-index
                 :id id
                 :move      move
+                :is_nullified false
                 :x x
                 :y y
-                :client_id client-id} 
+                :client_id client-id}
                {:connection tx})))
 
 (defn delete! [game-id, id]
-  (move-delete-by-id! {:game_id (name game-id), 
-                       :id (name id)}))
+  (jdbc/with-db-transaction [tx db/db]
+    (.addUpdateListener (:connection tx)
+                        move-trigger/listener)
+    (move-delete-by-id! {:game_id (name game-id),
+                         :id (name id)}
+                        {:connection tx})))
 
 
 (defn move-postfind [move-raw]
-  (let [
-        move-key-fix
+  (let [move-key-fix
         (walk/postwalk (fn [x]
                          (if-let [x-keyword (and (keyword? x)
-                                             x)]
-                           (keyword (str/replace  
-                                                 (name x-keyword)                       
-                                                 "_" 
-                                                 "-")) 
+                                                 x)]
+                           (keyword (str/replace
+                                     (name x-keyword)
+                                     "_"
+                                     "-"))
                            x))
                        move-raw)
         move
@@ -65,21 +69,24 @@
 (defn find [game-id, id]
   (if-let [move-raw
            (first (move-find-by-id {:game_id   game-id
-                                    :id        id}))]
+                                    :id        id
+                                    :is_nullified false}))]
     (move-postfind move-raw)))
 
 (defn find-by-player-id [game-id, player-id]
   (if-let [moves-raw
-           (move-find-by-player-id {:game_id (name game-id), 
-                                    :player_id (name player-id)})]
-    (map move-postfind        
+           (move-find-by-player-id {:game_id (name game-id),
+                                    :player_id (name player-id)
+                                    :is_nullified false})]
+    (map move-postfind
          moves-raw)))
 
 (defn find-by-game-id [game-id]
   (if-let [moves-raw
-           (move-find-by-game-id {:game_id (name game-id)})]
+           (move-find-by-game-id {:game_id (name game-id)
+                                  :is_nullified false})]
     (map :id
-         (map move-postfind        
+         (map move-postfind
               moves-raw))))
          
 

@@ -120,7 +120,6 @@
     (.debug log (str "No subscriber found to remove at error")))
   nil)
 
-
 (def handlers {:on-connect on-connect
                :on-error on-error 
                :on-text nil

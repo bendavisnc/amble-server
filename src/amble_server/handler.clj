@@ -28,6 +28,7 @@
            (OPTIONS "*" [] "")
            (GET "/" [] "Hello World")
            (GET "/id/default-game" [] game-api/get-game-id)
+           (GET "/game" [] game-api/get-game-id)
            (GET "/game/:game-id" [] game-api/get)
            (GET "/game/:game-id/board" [] board-api/get)
            (GET "/game/:game-id/player" [] player-api/get-all)

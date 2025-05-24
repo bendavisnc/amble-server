@@ -2,7 +2,7 @@
   (:require [amble-server.db.game-sql :as game-sql])
   (:refer-clojure :exclude [find]))
 
-(def success ::sucess)
+(def success ::success)
 (def failure ::failure)
 
 (defn create! [id]
@@ -24,7 +24,7 @@
 (defn delete!
   "Deletes the game with the given game id."
   [id]
-  (try (let [row-delete-count  (game-sql/delete! id)]
+  (try (let [row-delete-count  (game-sql/delete! (name id))]
          (when (not (= 1 row-delete-count))
            (throw (new IllegalStateException (format "Bad db result \"%s\"."
                                                      row-delete-count))))
