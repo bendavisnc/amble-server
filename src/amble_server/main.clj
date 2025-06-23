@@ -1,6 +1,7 @@
 (ns amble-server.main
   (:require [ring.adapter.jetty9 :as jetty]
             [amble-server.handler :as amble-handler]
+            [amble-server.config :as amble-config] 
             [clojure.core.async :as async]
             [ring.middleware.reload :as reload]
             [amble-server.move-async :as move-async]
@@ -19,7 +20,8 @@
     (move-async/init! latest-move-index-chan)
     (.info log "Starting websockets ready web server.")
     (jetty/run-jetty (reload/wrap-reload (wrap-with-logger amble-handler/app)) 
-                     {:port       3000
+                    ;;  {:port       (amble-config/port)
+                     {:port        (Integer/parseInt amble-config/port)
                       ;:join?      true
                       :daemon?    true
                       :websockets {move-async/websockets-path
