@@ -5,6 +5,7 @@
             [ring.middleware.json :as middleware-json]
             [amble-server.utils :as utils]
             [amble-server.api.game :as game-api]
+            [ring.middleware.cors :refer [wrap-cors]]
             [amble-server.api.player :as player-api]
             [amble-server.api.move :as move-api]
             [amble-server.api.board :as board-api]))
@@ -23,6 +24,12 @@
           (assoc-in [:headers
                      "Access-Control-Allow-Headers"]
                     "*")))))
+
+(defn wrap-cors-for-client [handler]
+  (wrap-cors handler
+    :access-control-allow-origin [#"http://localhost:9500"]
+    :access-control-allow-methods [:get :post :put :delete]
+    :access-control-allow-credentials "true"))
 
 (defroutes app-routes
            (OPTIONS "*" [] "")
@@ -43,7 +50,7 @@
            (route/not-found "Not Found"))
 
 (def app (middleware-json/wrap-json-response
-           (middleware-custom
+           (wrap-cors-for-client
               (middleware-default/wrap-defaults app-routes
                                                   (assoc-in middleware-default/api-defaults
                                                               [:responses, :content-types]

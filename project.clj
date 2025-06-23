@@ -10,6 +10,7 @@
                  [org.clojure/data.json "1.0.0"]
                  [org.clojure/core.async "1.3.610"]
                  [ring-logger "1.1.1"]
+                 [ring-cors/ring-cors "0.1.13"]
                  [bananaoomarang/ring-debug-logging "1.1.0"]
                  [org.apache.logging.log4j/log4j-api "2.14.0"]
                  [org.apache.logging.log4j/log4j-core "2.14.0"]
