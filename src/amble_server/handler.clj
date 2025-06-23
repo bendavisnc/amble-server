@@ -1,33 +1,19 @@
 (ns amble-server.handler
-  (:require [compojure.core :refer :all]
-            [compojure.route :as route]
-            [ring.middleware.defaults :as middleware-default]
-            [ring.middleware.json :as middleware-json]
-            [amble-server.utils :as utils]
-            [amble-server.api.game :as game-api]
-            [ring.middleware.cors :refer [wrap-cors]]
-            [amble-server.api.player :as player-api]
-            [amble-server.api.move :as move-api]
-            [amble-server.api.board :as board-api]))
-
-(defn middleware-custom [handler]
-  (fn [req]
-    (let [response-raw (handler req)]
-      ; (println response-raw)
-      (-> response-raw
-          (assoc-in [:headers
-                     "Access-Control-Allow-Origin"]
-                    "*")
-          (assoc-in [:headers
-                     "Access-Control-Allow-Methods"]
-                    "*")
-          (assoc-in [:headers
-                     "Access-Control-Allow-Headers"]
-                    "*")))))
+  (:require
+   [amble-server.api.board :as board-api]
+   [amble-server.api.game :as game-api]
+   [amble-server.api.move :as move-api]
+   [amble-server.api.player :as player-api]
+   [amble-server.config :as amble-config]
+   [compojure.core :refer :all]
+   [compojure.route :as route]
+   [ring.middleware.cors :refer [wrap-cors]]
+   [ring.middleware.defaults :as middleware-default]
+   [ring.middleware.json :as middleware-json]))
 
 (defn wrap-cors-for-client [handler]
   (wrap-cors handler
-    :access-control-allow-origin [#"http://localhost:9500"]
+    :access-control-allow-origin [(re-pattern amble-config/client-url)]
     :access-control-allow-methods [:get :post :put :delete]
     :access-control-allow-credentials "true"))
 

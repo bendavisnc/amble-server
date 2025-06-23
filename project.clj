@@ -34,6 +34,7 @@
                         [ring/ring-mock "0.3.2"]
                         [ring/ring-devel "1.9.4"]]
                        :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
-         :env {:port 3000}}} 
+         :env {:port 3000 
+               :client-url "http://localhost:9500"}}} 
   :java-source-paths ["src-java"]
   :javac-options     ["-target" "1.8" "-source" "1.8"])
