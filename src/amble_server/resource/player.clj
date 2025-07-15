@@ -1,40 +1,40 @@
 (ns amble-server.resource.player
-  (:require [amble-server.db.player :as player-db]
-            [amble-server.db.game :as game-db])
-  (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager])
-  (:refer-clojure :exclude [get]))
+  (:refer-clojure :exclude [get])
+  (:require
+   [amble-server.db.game :as game-db]
+   [amble-server.db.player :as player-db])
+  (:import
+   (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.resource.player"))
 
 (defn add! [game-id, player-id]
   (first
-   (for [game-db-find [(game-db/find game-id)]
-         :when (or (= {game-db/success game-id} game-db-find)
-                   (do
-                     (.info log "No game found by id to add player.")
-                     (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id))
-                     nil))
-         player-db-find [(player-db/find game-id player-id)]
-         :when (or (= {player-db/success nil} player-db-find)
-                   (do
-                     (.info log "Cannot add player that already exists.")
-                     (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id))
-                     nil))
-         player-db-add [(player-db/add! game-id player-id)]
-         :when (or (and (player-db/failure player-db-add)
-                        (do
-                          (.info log "Error occured while trying to add player to game.")
-                          (throw (new RuntimeException (player-db/failure player-db-add)))))
-                   true)        
-         :when (or (and (not (= {player-db/success player-id} player-db-add))
-                        (do
-                          (.info log "The unexpected occurred while trying to add player to game.")
-                          (.info log (format "  \"%s\"" player-db-add))
-                          (throw (new RuntimeException player-db-add))))
-                   true)]
-     player-id)))
-
+    (for [game-db-find [(game-db/find game-id)]
+          :when (or (= {game-db/success game-id} game-db-find)
+                    (do
+                      (.info log "No game found by id to add player.")
+                      (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id))
+                      nil))
+          player-db-find [(player-db/find game-id player-id)]
+          :when (or (= {player-db/success nil} player-db-find)
+                    (do
+                      (.info log "Cannot add player that already exists.")
+                      (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id))
+                      nil))
+          player-db-add [(player-db/add! game-id player-id)]
+          :when (or (and (player-db/failure player-db-add)
+                         (do
+                           (.info log "Error occured while trying to add player to game.")
+                           (throw (new RuntimeException (player-db/failure player-db-add)))))
+                    true)
+          :when (or (and (not (= {player-db/success player-id} player-db-add))
+                         (do
+                           (.info log "The unexpected occurred while trying to add player to game.")
+                           (.info log (format "  \"%s\"" player-db-add))
+                           (throw (new RuntimeException player-db-add))))
+                    true)]
+      player-id)))
 
 ;; (defn get-all [game-id]
 ;;   (let [db-result (player-db/find game-id)
@@ -56,35 +56,33 @@
 
 (defn get-all [game-id]
   (first
-   (for [game-db-find [(game-db/find game-id)]
-         :when (or (= {game-db/success game-id} game-db-find)
-                   (do
-                     (.info log "No game found.")
-                     (.info log (format "  \"%s\"" game-id))
-                     nil))
-         player-db-find [(player-db/find game-id)]
-         :when (or (and (player-db/failure player-db-find)
-                        (do
-                          (.info log "Problem while getting players of game.")
-                          (.info log (format "  \"%s\"" game-id))
-                          (throw (new RuntimeException (player-db/failure player-db-find)))))
-                   true)]
-     (player-db/success player-db-find))))
-                    
-
+    (for [game-db-find [(game-db/find game-id)]
+          :when (or (= {game-db/success game-id} game-db-find)
+                    (do
+                      (.info log "No game found.")
+                      (.info log (format "  \"%s\"" game-id))
+                      nil))
+          player-db-find [(player-db/find game-id)]
+          :when (or (and (player-db/failure player-db-find)
+                         (do
+                           (.info log "Problem while getting players of game.")
+                           (.info log (format "  \"%s\"" game-id))
+                           (throw (new RuntimeException (player-db/failure player-db-find)))))
+                    true)]
+      (player-db/success player-db-find))))
 
 (defn get [game-id, player-id]
   (first
-   (for [game-db-find [(game-db/find game-id)]
-         :when (or (= {game-db/success game-id} game-db-find)
-                   (do
-                     (.info log "No game found for player.")
-                     (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id))
-                     nil))
-         player-db-find [(player-db/find game-id player-id)]
-         :when (or (= {player-db/success player-id} player-db-find)
-                   (do
-                     (.info log "No player found for game.")
-                     (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id)))
-                   nil)]
-     player-id)))
+    (for [game-db-find [(game-db/find game-id)]
+          :when (or (= {game-db/success game-id} game-db-find)
+                    (do
+                      (.info log "No game found for player.")
+                      (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id))
+                      nil))
+          player-db-find [(player-db/find game-id player-id)]
+          :when (or (= {player-db/success player-id} player-db-find)
+                    (do
+                      (.info log "No player found for game.")
+                      (.info log (format "  \"%s\"  \n\"%s\\\"" game-id, player-id)))
+                    nil)]
+      player-id)))

@@ -1,9 +1,9 @@
 (ns amble-server.db.core
   (:require
-            [clojure.java.jdbc :as jdbc] 
-            [clojure.java.io :as io])
-  (:import [java.sql DriverManager]))
-
+   [clojure.java.io :as io]
+   [clojure.java.jdbc :as jdbc])
+  (:import
+   (java.sql DriverManager)))
 
 (def target-db-path "../.amble-db/amble.db")
 
@@ -18,4 +18,4 @@
 ;;   (let [conn (jdbc/get-connection db)]
 ;;     (when-let [listener]  
 ;;       (.addUpdateListener conn listener))   
-;;     conn)) 
+;;     conn))

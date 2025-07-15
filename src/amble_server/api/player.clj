@@ -1,15 +1,14 @@
 (ns amble-server.api.player
   (:require
    [amble-server.resource.game :as game-resource]
-   [amble-server.resource.player :as player-resource]
    [amble-server.resource.move :as move-resource]
-   [ring.util.response :as response-util]
+   [amble-server.resource.player :as player-resource]
    [amble-server.utils :as utils]
+   [clojure.edn :as edn]
    [clojure.java.io :as io]
-   [clojure.edn :as edn])
-  (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager]))
-
+   [ring.util.response :as response-util])
+  (:import
+   (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.api.player"))
 
@@ -19,9 +18,9 @@
     (try
       (cond (not game-found)
             (response-util/status req 404)
-            :else 
+            :else
             (response-util/response
-             (player-resource/get-all game-id)))
+              (player-resource/get-all game-id)))
       (catch Throwable e
         (.error log "An error occurred during game board get.")
         (.error log e)
@@ -47,21 +46,9 @@
                                 player-coord-indexes))]
     player-coords))
 
-;; (defn get [req]
-;;   (let [game-id (:game-id (:params req))
-;;         id (:player-id (:params req))]
-;;     (if-let [_ (player-resource/get game-id, id)]
-;;       (-> (response-util/response (crude-player-indexes-map id))
-;;           (response-util/status 200))
-;;       (-> (response-util/response [])
-;;           (response-util/status 404)))))
-
 (defn merge-positions-and-moves [simple-position-list, moves-existing]
-  (.info log "whats going on?")
-  (.info log (vec moves-existing))
-  (.info log simple-position-list) 
   (reduce (fn [acc, move]
-            (assoc acc 
+            (assoc acc
                    (Integer/parseInt (:player-piece-index move)) ;; maybe revisit
                    [(:x move)
                     (:y move)]))
@@ -74,35 +61,30 @@
   (try
     (let [game-id (keyword (:game-id (:params req)))
           player-id (keyword (:player-id (:params req)))
-          _ (.info log (str "wtffffff " (type player-id)))
           player-existing (player-resource/get game-id, player-id)
-          _ (.info log (str "wtf " player-existing))
           player-simple-position-list (crude-player-indexes-map player-id)]
-      (cond 
-            (nil? player-existing)
-            (do (.info log "No player found for game, \"" game-id "\".")
-                (-> (response-util/response [])
-                    (response-util/status 404)))
+      (cond
+        (nil? player-existing)
+        (do (.info log "No player found for game, \"" game-id "\".")
+            (-> (response-util/response [])
+                (response-util/status 404)))
 
-            (empty? player-simple-position-list)
-            (do (.info log "Returning existing player with no moves existing.")
-                (-> (response-util/response (crude-player-indexes-map player-id))
-                    (response-util/status 200)))
+        (empty? player-simple-position-list)
+        (do (.info log "Returning existing player with no moves existing.")
+            (-> (response-util/response (crude-player-indexes-map player-id))
+                (response-util/status 200)))
 
-            true
-            (let [moves-existing
-                  (move-resource/get-by-player-id game-id
-                                                  player-id)]
-              (-> (response-util/response (merge-positions-and-moves player-simple-position-list moves-existing)) 
-                  (response-util/status 200)))))
-
+        true
+        (let [moves-existing
+              (move-resource/get-by-player-id game-id
+                                              player-id)]
+          (-> (response-util/response (merge-positions-and-moves player-simple-position-list moves-existing))
+              (response-util/status 200)))))
 
     (catch Throwable e
       (.error log "Something bad happened when trying to get a player from the game," "\"" (:game-id (:params req)) "\".")
       (.error log e)
       (response-util/status req 500))))
 
-
-;(response-util/response
-;(crude-player-indexes-map id)))))
-
+; (response-util/response
+; (crude-player-indexes-map id)))))

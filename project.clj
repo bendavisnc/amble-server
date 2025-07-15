@@ -1,5 +1,5 @@
 (defproject amble-server "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+  :description "Implementation of the amble game server API."
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.10.0"]
@@ -20,9 +20,6 @@
                  [org.xerial/sqlite-jdbc "3.36.0.3"]
                  [org.clojure/core.async "1.5.648"]]
 
-
-
-
   :plugins [[lein-ring "0.12.5"]
             [lein-auto "0.1.3"]
             [lein-cljfmt "0.7.0"]
@@ -35,6 +32,6 @@
                         [ring/ring-devel "1.9.4"]]
                        :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
          :env {:port 3000 
-               :client-url "http://localhost:9500"}}} 
+               :client-url "http://192.168.86.23:9500"}}} 
   :java-source-paths ["src-java"]
   :javac-options     ["-target" "1.8" "-source" "1.8"])

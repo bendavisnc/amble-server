@@ -1,11 +1,14 @@
 (ns amble-server.move-async
-  (:require [clojure.core.async :refer [go, go-loop] :as async]
-            [ring.adapter.jetty9 :as jetty]
-            [amble-server.resource.move :as move-resource])
-  (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager]
-           [java.lang Exception]))
-
+  "Handles websocket connections for move updates.
+   Provides functionality to add and remove subscribers, notify them of new moves,
+   and handle connection events."
+  (:require
+   [amble-server.resource.move :as move-resource]
+   [clojure.core.async :as async :refer [go go-loop]]
+   [ring.adapter.jetty9 :as jetty])
+  (:import
+   (java.lang Exception)
+   (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.move-async"))
 
@@ -26,22 +29,20 @@
           move-second-go))
       move)))
 
-
 (defn add-subscriber! [subscriber]
   (.info log (str "Adding subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) "."))
-  (swap! subscribers assoc-in [(:game-id subscriber) (:subscriber-id subscriber)] 
+  (swap! subscribers assoc-in [(:game-id subscriber) (:subscriber-id subscriber)]
                               subscriber)
   (.info log (str "Added subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) ".")))
 
 (defn remove-subscriber! [subscriber]
   (.info log (str "Removing subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) "."))
-  ;; (swap! subscribers dissoc (:subscriber-id subscriber))
-  ;; (update-in {:a {:b 0 :c 1}} [:a] dissoc :b)
   (swap! subscribers update-in [(:game-id subscriber)] dissoc (:subscriber-id subscriber))
   (.info log (str "Removed subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) ".")))
-  ;; (swap! subscribers #(filter (= % subscriber))))
 
-(defn notify-subscribers! [latest-move-index]
+(defn notify-subscribers! 
+  "Updates callback listeners of a game's latest move id."
+  [latest-move-index]
   (try
     (let [_ (Thread/sleep 250) ;; todo, remove this line and figure out a way to ensure that the db transaction is successful already.
           move-latest (move-latest-with-retry latest-move-index)
@@ -60,22 +61,22 @@
         (try
           (.info log (str "Updating " (count move-game-subscribers) " subscribers, game, \"" (name game-id) "\"."))
           (let [{:keys [update-subscriber!]} (move-game-subscribers
-                                              subscriber-key)]
+                                               subscriber-key)]
             (update-subscriber! (str (:id move-latest))))
           (catch Exception e
             (do
               (.error log "Something bad happened while trying to notify subscriber.", e)
               (when-let [subscriber-to-remove (move-game-subscribers
-                                               subscriber-key)] 
+                                                subscriber-key)]
                 (remove-subscriber! subscriber-to-remove)))))))
     (catch Throwable e
       (.error log "Something bad happened while trying to notify subscribers.", e))))
 
-(defn subscriber 
+(defn subscriber
   "Creates a subscriber instance."
   [ws, game-id]
   {:game-id game-id
-                                                               :subscriber-id 
+   :subscriber-id
    (.hashCode ws)
    :update-subscriber!
    (partial jetty/send! ws)})
@@ -95,33 +96,33 @@
 (defn find-subscriber-by-id [subscriber-id]
   (let [subscribers-all (mapcat (fn [[_ subscribers-by-game-id]]
                                     (vals subscribers-by-game-id))
-                                (deref subscribers))   
+                                (deref subscribers))
         subscriber-found
-        (first (filter (fn [s]                         
+        (first (filter (fn [s]
                          (= (:subscriber-id s)
-                            subscriber-id)) 
-                       subscribers-all))]      
+                            subscriber-id))
+                       subscribers-all))]
     (if-let [subscriber subscriber-found]
-      subscriber   
+      subscriber
       (do (.debug log (str "Can't find subscriber by id, \"" subscriber-id "\"."))
           nil))))
 
 (defn on-close [ws & args]
   (.info log "Existing async channel to close.")
   (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
-    (remove-subscriber! subscriber-to-remove)   
+    (remove-subscriber! subscriber-to-remove)
     (.debug log (str "No subscriber found to remove at close.")))
   nil)
 
 (defn on-error [ws & args]
   (.error log (str "Encountered new async error. \n" (vec args)))
   (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
-    (remove-subscriber! subscriber-to-remove)   
+    (remove-subscriber! subscriber-to-remove)
     (.debug log (str "No subscriber found to remove at error")))
   nil)
 
 (def handlers {:on-connect on-connect
-               :on-error on-error 
+               :on-error on-error
                :on-text nil
                :on-close on-close
                :on-bytes nil})

@@ -1,13 +1,13 @@
 (ns amble-server.api.move
   (:require
-   [amble-server.resource.move :as move-resource]
    [amble-server.resource.game :as game-resource]
-    ;; [amble-server.async-resource.move :as async-resource-move]
-   [ring.util.response :as response-util]
+   [amble-server.resource.move :as move-resource]
+   [clojure.data.json :as json]
    [ring.util.request :as request-util]
-   [clojure.data.json :as json])
-  (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager]))
+   ;; [amble-server.async-resource.move :as async-resource-move]
+   [ring.util.response :as response-util])
+  (:import
+   (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.api.move"))
 
@@ -33,9 +33,9 @@
     (try
       (cond (not game-found)
             (response-util/status req 404)
-            :else 
+            :else
             (response-util/response
-             (move-resource/get-all game-id)))
+              (move-resource/get-all game-id)))
       (catch Throwable e
         (.error log "An error occurred during game move get all.")
         (.error log e)
@@ -66,9 +66,8 @@
     (let [game-id (:game-id (:params req))
           id (:id (:params req))
           _ (move-resource/delete! game-id, id)]
-       (response-util/response nil)) 
+      (response-util/response nil))
     (catch Throwable e
       (.error log "Something bad happened when trying to delete a move from the game," "\"" (:game-id (:params req)) "\".")
       (.error log e)
       (response-util/status req 500))))
-

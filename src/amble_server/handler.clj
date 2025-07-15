@@ -46,4 +46,3 @@
                                         [:responses :content-types] false))
       wrap-cors-for-client
       (middleware-json/wrap-json-response {:pretty-print true})))
-

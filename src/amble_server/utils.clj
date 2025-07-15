@@ -1,5 +1,6 @@
 (ns amble-server.utils
-  (:import (java.util Calendar Locale)))
+  (:import
+   (java.util Calendar Locale)))
 
 (defn- day-of-week []
   (.getDisplayName (Calendar/getInstance)
@@ -12,4 +13,3 @@
     "The"
     (day-of-week)
     "Game"))
-

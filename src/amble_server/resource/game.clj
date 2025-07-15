@@ -1,8 +1,8 @@
 (ns amble-server.resource.game
   (:require
-    [amble-server.db.game :as game-db])
-  (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager]))
+   [amble-server.db.game :as game-db])
+  (:import
+   (org.apache.logging.log4j LogManager Logger)))
 
 (declare inform)
 
@@ -49,12 +49,11 @@
         (.info log "Game found!")
         (.info log (format "  \"%s\"" id))
         (game-db/success db-result))
-     :default
+      :default
       (do
         (.info log "The unexpected occurred while trying to get game.")
         (.info log (format "  \"%s\"" db-result))
         (throw (new RuntimeException db-result))))))
-
 
 (defn delete! [id]
   (let [db-result (game-db/delete! id)]
@@ -62,15 +61,13 @@
       (do (.info log "Game not deleted.")
           (.info log (format "  \"%s\"" db-result))
           (throw (game-db/failure db-result)))
-      ;;else
+      ;; else
       (if (= {game-db/success id}
              db-result)
         (do (.info log "Game deleted.")
             (.info log (format "  \"%s\"" id))
             id)
-        ;;else
+        ;; else
         (do (.info log "No game deleted.")
             (.info log (format "  \"%s\"" db-result))
             "")))))
-
-

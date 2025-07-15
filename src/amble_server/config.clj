@@ -1,5 +1,6 @@
 (ns amble-server.config
-  (:require [environ.core :refer [env]]))
+  (:require
+   [environ.core :refer [env]]))
 
 (def client-url
   (env :client-url))

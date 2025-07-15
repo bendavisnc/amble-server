@@ -1,11 +1,11 @@
 (ns amble-server.api.game
   (:require
-    [amble-server.resource.game :as game-resource]
-    [amble-server.resource.player :as player-resource]
-    [ring.util.response :as response-util]
-    [amble-server.utils :as utils])
-  (:import [org.apache.logging.log4j Logger]
-           [org.apache.logging.log4j LogManager]))
+   [amble-server.resource.game :as game-resource]
+   [amble-server.resource.player :as player-resource]
+   [amble-server.utils :as utils]
+   [ring.util.response :as response-util])
+  (:import
+   (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.api.game"))
 
@@ -26,12 +26,12 @@
       (if (not (nil? already-existing-game-id))
         (-> (response-util/response "Conflict.")
             (response-util/status 409))
-        ;else
+        ; else
         (let [was-game-created (game-resource/create! game-id)
               _ (assert (not (nil? was-game-created))
                         "Problem creating game.")
               players-created (doall (map (fn [i]
-                                            (player-resource/add! game-id 
+                                            (player-resource/add! game-id
                                                                   (keyword (str "player-"
                                                                                 (nth ["one", "two", "three", "four", "five", "six"]
                                                                                      i)))))
@@ -96,4 +96,3 @@
       (.error log "An error occurred during game delete.")
       (.error log e)
       (response-util/status req 500))))
-

@@ -1,6 +1,7 @@
 (ns amble-server.db.game
-  (:require [amble-server.db.game-sql :as game-sql])
-  (:refer-clojure :exclude [find]))
+  (:refer-clojure :exclude [find])
+  (:require
+   [amble-server.db.game-sql :as game-sql]))
 
 (def success ::success)
 (def failure ::failure)
@@ -31,4 +32,3 @@
          {success (keyword id)})
        (catch Throwable e
          {failure e})))
-

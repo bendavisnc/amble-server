@@ -2,14 +2,13 @@
   (:require
    [amble-server.db.core :as db]
    [amble-server.db.move-trigger :as move-trigger]
-   [yesql.core :as yesql]
    [clojure.edn :as edn]
-   [clojure.string :as str]
    [clojure.java.jdbc :as jdbc]
-   [clojure.walk :as walk])
+   [clojure.string :as str]
+   [clojure.walk :as walk]
+   [yesql.core :as yesql])
   (:import
-   [org.apache.logging.log4j LogManager]))
-
+   (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.db.move-sql"))
 
@@ -46,10 +45,9 @@
   (jdbc/with-db-transaction [tx db/db]
     (.addUpdateListener (:connection tx)
                         move-trigger/listener)
-    (move-delete-by-id! {:game_id (name game-id),
+    (move-delete-by-id! {:game_id (name game-id)
                          :id (name id)}
                         {:connection tx})))
-
 
 (defn move-postfind [move-raw]
   (let [move-key-fix
@@ -57,9 +55,9 @@
                          (if-let [x-keyword (and (keyword? x)
                                                  x)]
                            (keyword (str/replace
-                                     (name x-keyword)
-                                     "_"
-                                     "-"))
+                                      (name x-keyword)
+                                      "_"
+                                      "-"))
                            x))
                        move-raw)
         move
@@ -75,7 +73,7 @@
 
 (defn find-by-player-id [game-id, player-id]
   (if-let [moves-raw
-           (move-find-by-player-id {:game_id (name game-id),
+           (move-find-by-player-id {:game_id (name game-id)
                                     :player_id (name player-id)
                                     :is_nullified false})]
     (map move-postfind
@@ -88,13 +86,11 @@
     (map :id
          (map move-postfind
               moves-raw))))
-         
 
 (defn find-by-rowid [rowid]
   (if-let [move-raw
            (first (move-find-by-rowid {:rowid rowid}))]
     (move-postfind move-raw)))
-   
 
 (defn count [game-id]
   (move-count {:game_id   game-id}))

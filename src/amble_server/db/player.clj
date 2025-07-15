@@ -1,12 +1,13 @@
 (ns amble-server.db.player
-  (:require [amble-server.db.player-sql :as player-sql])
-  (:refer-clojure :exclude [find]))
+  (:refer-clojure :exclude [find])
+  (:require
+   [amble-server.db.player-sql :as player-sql]))
 
 (def success ::success)
 (def failure ::failure)
 
 (defn add! [game-id, id]
-  (try (let [row-add-count  (player-sql/add! (name game-id,) 
+  (try (let [row-add-count  (player-sql/add! (name game-id)
                                              (name id))]
          (when (not (= 1 row-add-count))
            (throw (new IllegalStateException (format "Bad db result \"%s\"."

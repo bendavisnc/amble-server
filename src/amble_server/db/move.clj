@@ -2,7 +2,7 @@
   (:require
    [amble-server.db.move-sql :as move-sql])
   (:import
-   [org.apache.logging.log4j LogManager]))
+   (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.db.move"))
 
@@ -14,7 +14,7 @@
   (try (let [[{:keys [count]}] (move-sql/count game-id)
              add (move-sql/add! game-id, player-id, player-piece-index, count, (str move), x, y, client-id)]
          (if (not (pos? add))
-           {failure (new IllegalStateException (format "Bad db result \"%s\".",
+           {failure (new IllegalStateException (format "Bad db result \"%s\"."
                                                        add))}
            {success count}))
        (catch Throwable e

@@ -17,3 +17,7 @@ runtests:
 
 rerundevserver: 
 	lein run
+
+format:
+	@echo "Formatting clj..."
+	standard-clj fix src
