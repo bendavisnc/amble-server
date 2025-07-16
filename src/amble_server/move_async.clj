@@ -40,7 +40,7 @@
   (swap! subscribers update-in [(:game-id subscriber)] dissoc (:subscriber-id subscriber))
   (.info log (str "Removed subscriber to \"" (name (:game-id subscriber)) "\" subscriber list, current count, " (count ((:game-id subscriber) (deref subscribers))) ".")))
 
-(defn notify-subscribers! 
+(defn notify-subscribers!
   "Updates callback listeners of a game's latest move id."
   [latest-move-index]
   (try

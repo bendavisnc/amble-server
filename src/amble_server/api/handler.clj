@@ -1,4 +1,4 @@
-(ns amble-server.handler
+(ns amble-server.api.handler
   (:require
    [amble-server.api.board :as board-api]
    [amble-server.api.game :as game-api]
@@ -11,18 +11,16 @@
    [ring.middleware.defaults :as defaults]
    [ring.middleware.json :as middleware-json]))
 
-;; CORS middleware configured to allow access from client URL
-(defn wrap-cors-for-client [handler]
+(defn- wrap-cors-for-client [handler]
   (wrap-cors handler
     :access-control-allow-origin [(re-pattern (or amble-config/client-url
                                                   (throw (new Exception "`client-url` not set in environment variables."))))]
     :access-control-allow-methods [:get :post :put :delete :options]
     :access-control-allow-credentials (str true)))
 
-;; Route definitions
 (defroutes app-routes
   (OPTIONS "*" [] "")
-  (GET "/" [] "Hello World")
+  (GET "/ping" [] "Hello World")
   (GET "/id/default-game" [] game-api/get-game-id)
   (GET "/game" [] game-api/get-game-id)
   (GET "/game/:game-id" [] game-api/get)
@@ -38,10 +36,8 @@
   (DELETE "/game/:game-id/move/:id" [] move-api/delete!)
   (route/not-found "Not Found"))
 
-;; Compose middleware
-(def app
+(def handler
   (-> app-routes
-      ;; Use Ring defaults, disabling content type negotiation
       (defaults/wrap-defaults (assoc-in defaults/api-defaults
                                         [:responses :content-types] false))
       wrap-cors-for-client

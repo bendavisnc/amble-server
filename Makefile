@@ -11,8 +11,14 @@ clean:
 	rm -rf target
 	rm -R -d -f ../.amble-db
 
-runtests:
+test--once:
 	echo 'Running amble server tests'; \
+	lein test;
+
+test: test--once
+
+test--watch:
+	echo 'Running amble server tests, on every file change.'; \
 	lein auto test;
 
 rerundevserver: 

@@ -1,9 +1,9 @@
 (ns amble-server.main
   "Provides main entry point for initializing async websocket behavior and starting the web server."
   (:require
+   [amble-server.api.handler :as api-handler]
    [amble-server.config :as amble-config]
    [amble-server.db.move-trigger :as move-trigger]
-   [amble-server.handler :as amble-handler]
    [amble-server.move-async :as move-async]
    [clojure.core.async :as async]
    [ring-debug-logging.core :refer [wrap-with-logger]]
@@ -22,7 +22,7 @@
                                       latest-move-index)))
     (move-async/init! latest-move-index-chan)
     (.info log "Starting websockets ready web server.")
-    (jetty/run-jetty (reload/wrap-reload (wrap-with-logger amble-handler/app))
+    (jetty/run-jetty (reload/wrap-reload (wrap-with-logger api-handler/handler))
                      {:port        (Integer/parseInt amble-config/port)
                       :daemon?    true
                       :websockets {move-async/websockets-path
