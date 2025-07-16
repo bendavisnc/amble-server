@@ -2,14 +2,13 @@
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock-request]
             [amble-server.handler :refer :all]
-            [clojure.edn :as edn]
             [clojure.data.json :as json]))
 
 (def test-game-prefix "test-")
 
 (deftest test-amble-server-api
   (testing "create game"
-    (let [game-id (:body (app (mock-request/request :get "/game-id")))
+    (let [game-id (:body (app (mock-request/request :get "/game")))
           _ (app (mock-request/request :delete
                                        (str "/game/"
                                             test-game-prefix
@@ -24,7 +23,7 @@
              (json/read-str (:body create-game-response))))))
 
   (testing "get game"
-    (let [game-id (:body (app (mock-request/request :get "/game-id")))
+    (let [game-id (:body (app (mock-request/request :get "/game")))
           get-game-request (-> (mock-request/request :get
                                                      (str "/game/"
                                                           test-game-prefix
@@ -32,6 +31,5 @@
           get-game-response (app get-game-request)]
       (is (= 200
              (:status get-game-response)))
-      (is (= [[1 2] [3 4]]
+      (is (= {"game-id" (str test-game-prefix game-id)}
              (json/read-str (:body get-game-response)))))))
-

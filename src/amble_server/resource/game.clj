@@ -4,8 +4,6 @@
   (:import
    (org.apache.logging.log4j LogManager Logger)))
 
-(declare inform)
-
 (def log (. LogManager getLogger "amble-server.resource.game"))
 
 (defn create! [id]
@@ -32,8 +30,6 @@
           (str "Bad id value provided during get, \"" id "\"."))
   (let [db-result (game-db/find id)
         nil-result-value nil]
-    (.info log "what in the world")
-    (.info log db-result)
     (cond
       (game-db/failure db-result)
       (do
