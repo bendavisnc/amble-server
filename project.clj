@@ -15,6 +15,7 @@
                  [org.apache.logging.log4j/log4j-api "2.14.0"]
                  [org.apache.logging.log4j/log4j-core "2.14.0"]
                  [org.clojure/java.jdbc "0.7.8"]
+                 [org.postgresql/postgresql "42.7.3"]
                  [yesql "0.5.3"]
                  [environ "1.2.0"]
                  [org.xerial/sqlite-jdbc "3.36.0.3"]
@@ -32,6 +33,7 @@
                         [ring/ring-devel "1.9.4"]]
                        :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
          :env {:port 3000 
-               :client-url "http://192.168.86.23:9500"}}} 
+               :client-url "http://192.168.86.23:9500" 
+               :postgres true}}}
   :java-source-paths ["src-java"]
   :javac-options     ["-target" "1.8" "-source" "1.8"])

@@ -1,6 +1,6 @@
 (ns amble-server.db.game-sql
   (:require
-   [amble-server.db.core :as db]
+   [amble-server.db.db :as db]
    [yesql.core :as yesql]))
 
 (yesql/defquery game-add! "amble_server/db/game.sql" {:connection db/db})

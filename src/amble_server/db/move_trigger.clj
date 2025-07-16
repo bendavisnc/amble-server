@@ -2,7 +2,7 @@
   "Provides callback for move table updates based on SQLite update listener.
    This is used to notify subscribers of move updates."
   (:require
-   [amble-server.db.core :as db]
+   [amble-server.db.db :as db]
    [clojure.java.io :as io]
    [clojure.java.jdbc :as jdbc]
    [clojure.reflect :as reflect])

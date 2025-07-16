@@ -7,3 +7,6 @@
 
 (def port
   (env :port))
+
+(def postgres?
+  (Boolean/parseBoolean (env :postgres)))

@@ -51,7 +51,7 @@
           {:keys [move, x, y, client-id]} (json/read-str (request-util/body-string req)
                                                          :key-fn keyword)
           add (move-resource/add! game-id, player-id, player-piece-index, move, x, y, client-id)
-          move-response-value (move-resource/get game-id, add)]
+          move-response-value (move-resource/get game-id, (str add))]
       (-> (response-util/response move-response-value)
           (response-util/status 201)))
     (catch Throwable e

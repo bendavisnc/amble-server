@@ -1,6 +1,7 @@
 (ns amble-server.db.move-sql
   (:require
-   [amble-server.db.core :as db]
+   [amble-server.config :as amble-config]
+   [amble-server.db.db :as db]
    [amble-server.db.move-trigger :as move-trigger]
    [clojure.edn :as edn]
    [clojure.java.jdbc :as jdbc]
@@ -28,8 +29,9 @@
 
 (defn add! [game-id, player-id, player-piece-index, id, move, x, y, client-id]
   (jdbc/with-db-transaction [tx db/db]
-    (.addUpdateListener (:connection tx)
-                        move-trigger/listener)
+    (when-not amble-config/postgres?
+      (.addUpdateListener (:connection tx)
+                          move-trigger/listener))
     (move-add! {:game_id game-id
                 :player_id player-id
                 :player_piece_index player-piece-index
@@ -43,8 +45,9 @@
 
 (defn delete! [game-id, id]
   (jdbc/with-db-transaction [tx db/db]
-    (.addUpdateListener (:connection tx)
-                        move-trigger/listener)
+    (when-not amble-config/postgres?
+      (.addUpdateListener (:connection tx)
+                          move-trigger/listener))
     (move-delete-by-id! {:game_id (name game-id)
                          :id (name id)}
                         {:connection tx})))
@@ -65,6 +68,10 @@
     move))
 
 (defn find [game-id, id]
+  (assert (string? game-id)
+          (format "`game-id` must be a string, but was %s." (type game-id)))
+  (assert (string? id)
+          (format "`id` must be a string, but was %s." (type id)))
   (if-let [move-raw
            (first (move-find-by-id {:game_id   game-id
                                     :id        id
@@ -88,9 +95,13 @@
               moves-raw))))
 
 (defn find-by-rowid [rowid]
+  (assert (instance? Long rowid)
+          (format "Rowid must be a long, but was %s." (type rowid)))
   (if-let [move-raw
            (first (move-find-by-rowid {:rowid rowid}))]
     (move-postfind move-raw)))
 
 (defn count [game-id]
   (move-count {:game_id   game-id}))
+
+(comment (find "TheWednesdayGame" "0"))
