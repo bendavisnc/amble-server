@@ -7,10 +7,10 @@ rundevserver: clean initdb
 
 initdb:
 ifeq ($(POSTGRES),true)
-	echo 'Initializing amble PostgreSQL database'; \
+	@echo 'Initializing amble PostgreSQL database'; \
 	PGPASSWORD=admin psql -U admin -d amble -f migrations/initfreshdb.pg.sql
 else
-	echo 'Initializing amble SQLite database'; \
+	@echo 'Initializing amble SQLite database'; \
 	mkdir -p ../.amble-db; \
 	cd ../.amble-db && sqlite3 amble.db < ../amble-server/migrations/initfreshdb.sql
 endif
