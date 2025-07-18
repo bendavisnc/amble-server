@@ -3,11 +3,11 @@
    This is used to notify subscribers of move updates."
   (:require
    [amble-server.db.db :as db]
-   [clojure.java.jdbc :as jdbc]
-   [clojure.core.async :as core-async])
+   [clojure.core.async :as core-async]
+   [clojure.java.jdbc :as jdbc])
   (:import
-   (org.postgresql PGNotification PGConnection)
-   (org.apache.logging.log4j LogManager)))
+   (org.apache.logging.log4j LogManager)
+   (org.postgresql PGConnection PGNotification)))
 
 (def log (. LogManager getLogger "amble-server.move-trigger-postgres"))
 

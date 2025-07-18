@@ -13,9 +13,9 @@
 (def postgres-db
   {:classname   "org.postgresql.Driver"
    :subprotocol "postgresql"
-   :subname     "//localhost:5432/amble"
-   :user        "admin"
-   :password    "admin"})
+   :subname     amble-config/postgres-subname
+   :user        amble-config/postgres-username
+   :password    amble-config/postgres-password})
 
 (def db
   (if amble-config/postgres?

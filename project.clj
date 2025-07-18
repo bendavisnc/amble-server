@@ -34,6 +34,9 @@
                        :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
          :env {:port 3000 
                :client-url "http://192.168.86.23:9500" 
-               :postgres true}}}
+               :postgres true
+               :postgres-subname "//localhost:5432/amble"
+               :postgres-username "admin"
+               :postgres-password "admin"}}}
   :java-source-paths ["src-java"]
   :javac-options     ["-target" "1.8" "-source" "1.8"])

@@ -9,4 +9,14 @@
   (env :port))
 
 (def postgres?
-  (Boolean/parseBoolean (env :postgres)))
+  (= "true"
+     (env :postgres)))
+
+(def postgres-subname
+  (env :postgres-subname))
+
+(def postgres-username
+  (env :postgres-username))
+
+(def postgres-password
+  (env :postgres-password))
