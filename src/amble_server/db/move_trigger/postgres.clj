@@ -1,4 +1,4 @@
-(ns amble-server.db.move-trigger-postgres
+(ns amble-server.db.move-trigger.postgres
   "Provides callback for move table updates based on PostgreSQL LISTEN/NOTIFY.
    This is used to notify subscribers of move updates."
   (:require
@@ -41,6 +41,7 @@
 (defn init!
   "Adds a callback to the notification subscribers list."
   [callback]
+  (.info log "Initializing move trigger listener for PostgreSQL.")
   (swap! subscribers conj callback)
   (start-listener-loop!)
   nil)

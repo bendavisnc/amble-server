@@ -3,8 +3,8 @@
   (:require
    [amble-server.api.handler :as api-handler]
    [amble-server.config :as amble-config]
-   [amble-server.db.move-trigger :as move-trigger]
-   [amble-server.db.move-trigger-postgres :as move-trigger-postgres]
+   [amble-server.db.move-trigger.move-trigger :as move-trigger]
+   [amble-server.db.db :as db]
    [amble-server.move-async :as move-async]
    [clojure.core.async :as async]
    [ring-debug-logging.core :refer [wrap-with-logger]]
@@ -19,16 +19,11 @@
   (let [_ (.info log "Setting up amble server.")
         latest-move-index-chan (async/chan)]
     (if amble-config/postgres?
-      (do
-        (.info log "Using Postgres db.")
-        (move-trigger-postgres/init! (fn [latest-move-index]
-                                       (async/put! latest-move-index-chan
-                                                   latest-move-index))))
-      (do
-        (.info log "Using sqlite db.")
-        (move-trigger/init! (fn [latest-move-index]
-                              (async/put! latest-move-index-chan
-                                          latest-move-index)))))
+      (.info log "Using postgres db.")
+      (.info log "Using sqlite db."))
+    (move-trigger/init! (fn [latest-move-index]
+                           (async/put! latest-move-index-chan
+                                       latest-move-index)))
     (move-async/init! latest-move-index-chan)
     (.info log "Starting websockets ready web server.")
     (jetty/run-jetty (reload/wrap-reload (wrap-with-logger api-handler/handler))

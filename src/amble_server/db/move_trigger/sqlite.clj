@@ -1,13 +1,10 @@
-(ns amble-server.db.move-trigger
+(ns amble-server.db.move-trigger.sqlite
   "Provides callback for move table updates based on SQLite update listener.
    This is used to notify subscribers of move updates."
   (:require
    [amble-server.db.db :as db]
-   [clojure.java.io :as io]
-   [clojure.java.jdbc :as jdbc]
-   [clojure.reflect :as reflect])
+   [clojure.java.jdbc :as jdbc])
   (:import
-   (java.sql DriverManager)
    (org.apache.logging.log4j LogManager)
    (org.sqlite SQLiteUpdateListener)))
 
@@ -29,7 +26,7 @@
 (def listener
   (reify SQLiteUpdateListener
     (onUpdate [this, t, database, table, rowId]
-      (amble-server.db.move-trigger/on-update t, database, table, rowId))))
+      (on-update t, database, table, rowId))))
 
 (defn init!
   "Adds callback to subscribers state and registers the SQLite update listener."

@@ -2,7 +2,7 @@
   (:require
    [amble-server.config :as amble-config]
    [amble-server.db.db :as db]
-   [amble-server.db.move-trigger :as move-trigger]
+   [amble-server.db.move-trigger.sqlite :as move-trigger-sqlite]
    [clojure.edn :as edn]
    [clojure.java.jdbc :as jdbc]
    [clojure.string :as str]
@@ -31,7 +31,7 @@
   (jdbc/with-db-transaction [tx db/db]
     (when-not amble-config/postgres?
       (.addUpdateListener (:connection tx)
-                          move-trigger/listener))
+                          move-trigger-sqlite/listener))
     (move-add! {:game_id game-id
                 :player_id player-id
                 :player_piece_index player-piece-index
@@ -47,7 +47,7 @@
   (jdbc/with-db-transaction [tx db/db]
     (when-not amble-config/postgres?
       (.addUpdateListener (:connection tx)
-                          move-trigger/listener))
+                          move-trigger-sqlite/listener))
     (move-delete-by-id! {:game_id (name game-id)
                          :id (name id)}
                         {:connection tx})))
