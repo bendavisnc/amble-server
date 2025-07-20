@@ -27,16 +27,19 @@
             [lein-environ "1.2.0"]]
 
   :main amble-server.main
-  :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.2"]
-                        [ring/ring-devel "1.9.4"]]
-                       :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
-         :env {:port 3000 
-               :client-url "http://192.168.86.23:9500" 
-               :postgres true
-               :postgres-subname "//localhost:5432/amble"
-               :postgres-username "admin"
-               :postgres-password "admin"}}}
-  :java-source-paths ["src-java"]
-  :javac-options     ["-target" "1.8" "-source" "1.8"])
+  :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                                  [ring/ring-mock "0.3.2"]
+                                  [ring/ring-devel "1.9.4"]]
+                   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
+                   :env {:env "dev"
+                         :port 3000
+                         :client-url "http://localhost:9500"
+                         :postgres-subname "//localhost:5432/amble"
+                         :postgres-username "admin"
+                         :postgres-password "admin"}}
+             :uberjar {:aot :all
+                       :env {:port 3000
+                             :client-url "http://localhost:9500"
+                             :postgres-subname "//localhost:5432/amble"
+                             :postgres-username "admin"
+                             :postgres-password "admin"}}})

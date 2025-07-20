@@ -35,3 +35,8 @@ rerundevserver:
 format:
 	@echo "Formatting clj..."
 	standard-clj fix src
+
+prodbuild:
+	@echo "Building production version of amble server"
+	lein uberjar
+

@@ -8,10 +8,6 @@
 (def port
   (env :port))
 
-(def postgres?
-  (= "true"
-     (env :postgres)))
-
 (def postgres-subname
   (env :postgres-subname))
 
@@ -20,3 +16,11 @@
 
 (def postgres-password
   (env :postgres-password))
+
+(def postgres?
+  (and postgres-subname
+       postgres-username
+       postgres-password))
+
+(def devmode?
+  (= (env :env) "dev"))
