@@ -2,25 +2,29 @@
   (:require
    [environ.core :refer [env]]))
 
-(def client-url
+;; Defines a lazy var that evaluates once at first access, then stores the value
+(defmacro deflazy [name expr]
+  `(def ~name (let [d# (delay ~expr)] @d#)))
+
+(deflazy client-url
   (env :client-url))
 
-(def port
+(deflazy port
   (env :port))
 
-(def postgres-subname
+(deflazy postgres-subname
   (env :postgres-subname))
 
-(def postgres-username
+(deflazy postgres-username
   (env :postgres-username))
 
-(def postgres-password
+(deflazy postgres-password
   (env :postgres-password))
 
-(def postgres?
+(deflazy postgres?
   (and postgres-subname
        postgres-username
        postgres-password))
 
-(def devmode?
+(deflazy devmode?
   (= (env :env) "dev"))
