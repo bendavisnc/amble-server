@@ -1,3 +1,5 @@
+CMD ["printenv"]
+
 FROM clojure:openjdk-17-lein AS build
 
 WORKDIR /app
