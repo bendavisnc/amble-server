@@ -36,7 +36,7 @@
   (DELETE "/game/:game-id/move/:id" [] move-api/delete!)
   (route/not-found "Not Found"))
 
-(def handler
+(defn handler []
   (-> app-routes
       (defaults/wrap-defaults (assoc-in defaults/api-defaults
                                         [:responses :content-types] false))

@@ -33,7 +33,7 @@
                           (async/put! latest-move-index-chan latest-move-index)))
     (move-async/init! latest-move-index-chan)
     (.info log "Starting websockets-ready web server.")
-    (jetty/run-jetty (maybe-wrap-reload (wrap-with-logger api-handler/handler))
+    (jetty/run-jetty (maybe-wrap-reload (wrap-with-logger (api-handler/handler)))
                      {:port        (Integer/parseInt amble-config/port)
                       :daemon?     true
                       :websockets  {move-async/websockets-path
