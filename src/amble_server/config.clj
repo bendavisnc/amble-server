@@ -1,30 +1,21 @@
 (ns amble-server.config
-  (:require
-   [environ.core :refer [env]]))
+  (:require [environ.core :as environ]))
 
-;; Defines a lazy var that evaluates once at first access, then stores the value
-(defmacro deflazy [name expr]
-  `(def ~name (let [d# (delay ~expr)] @d#)))
+(defmacro defenv [name key]
+  `(def ~name ~(environ/env key)))
 
-(deflazy client-url
-  (env :client-url))
+(defenv client-url :client-url)
+(defenv port :port)
+(defenv postgres-subname :postgres-subname)
+(defenv postgres-username :postgres-username)
+(defenv postgres-password :postgres-password)
+(defenv dev-env :env)
 
-(deflazy port
-  (env :port))
-
-(deflazy postgres-subname
-  (env :postgres-subname))
-
-(deflazy postgres-username
-  (env :postgres-username))
-
-(deflazy postgres-password
-  (env :postgres-password))
-
-(deflazy postgres?
+;; Derived values
+(def postgres?
   (and postgres-subname
        postgres-username
        postgres-password))
 
-(deflazy devmode?
-  (= (env :env) "dev"))
+(def devmode?
+  (= dev-env "dev"))

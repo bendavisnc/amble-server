@@ -13,7 +13,8 @@
 (def postgres-db
   {:classname   "org.postgresql.Driver"
    :subprotocol "postgresql"
-   :subname     amble-config/postgres-subname
+   :subname     (or amble-config/postgres-subname
+                    (throw (new Exception "`postgres-subname` not set in environment variables.")))
    :user        amble-config/postgres-username
    :password    amble-config/postgres-password})
 
