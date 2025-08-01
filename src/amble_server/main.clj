@@ -27,7 +27,7 @@
   (let [_ (.info log "Setting up amble server.")
         latest-move-index-chan (async/chan)]
     (if amble-config/postgres?
-      (.info log "Using postgres db.")
+      (.info log (format "Using postgres db, `%s`." amble-config/postgres-subname))
       (.info log "Using sqlite db."))
     (move-trigger/init! (fn [latest-move-index]
                           (async/put! latest-move-index-chan latest-move-index)))
