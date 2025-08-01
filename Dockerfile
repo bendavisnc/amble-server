@@ -1,3 +1,4 @@
+
 FROM clojure:openjdk-17-lein AS build
 
 WORKDIR /app
@@ -16,4 +17,5 @@ COPY --from=build /app/target/*-standalone.jar app.jar
 
 EXPOSE 3000
 
-CMD ["printenv"]
+RUN echo $CLIENT_URL
+CMD ["java", "-jar", "app.jar"]
