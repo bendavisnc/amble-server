@@ -16,6 +16,7 @@
 (defn start-listener-loop! []
   (core-async/go-loop []
     (try
+      (println [:wut db/db])
       (jdbc/with-db-connection [con-db db/db]
         (let [conn (-> con-db :connection)]
           (.createStatement conn)
