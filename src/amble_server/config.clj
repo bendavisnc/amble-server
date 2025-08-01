@@ -1,26 +1,21 @@
 (ns amble-server.config
-  (:require
-   [environ.core :refer [env]]))
+  (:require [environ.core :as environ]))
 
-(def client-url
-  (env :client-url))
+(defmacro defenv [name key]
+  `(def ~name ~(environ/env key)))
 
-(def port
-  (env :port))
+(defenv client-url :client-url)
+(defenv port :port)
+(defenv postgres-subname :postgres-subname)
+(defenv postgres-username :postgres-username)
+(defenv postgres-password :postgres-password)
+(defenv dev-env :env)
 
-(def postgres-subname
-  (env :postgres-subname))
-
-(def postgres-username
-  (env :postgres-username))
-
-(def postgres-password
-  (env :postgres-password))
-
+;; Derived values
 (def postgres?
   (and postgres-subname
        postgres-username
        postgres-password))
 
 (def devmode?
-  (= (env :env) "dev"))
+  (= dev-env "dev"))
