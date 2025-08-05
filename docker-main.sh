@@ -2,10 +2,10 @@
 set -e
 
 echo "Testing DB connection..."
-PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USERNAME" -d "amble" -c '\l'
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USERNAME" -d "$DATABASE" -c '\l'
 
 echo "Running migration..."
-PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USERNAME" -d "amble" -f ./migrations/initfreshdb.pg.sql
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USERNAME" -d "$DATABASE" -f ./migrations/initfreshdb.pg.sql
 
 echo "Starting app..."
 exec java -jar app.jar
