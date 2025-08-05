@@ -1,4 +1,4 @@
-(defproject amble-server "0.1.0-SNAPSHOT"
+(defproject amble-server "0.0.0-SNAPSHOT"
   :description "Implementation of the amble game server API."
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
