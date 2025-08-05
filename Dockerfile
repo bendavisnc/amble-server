@@ -24,7 +24,7 @@ COPY --from=build /app/migrations migrations
 
 RUN apt-get update && apt-get install -y postgresql-client && apt-get clean
 
-EXPOSE 3000
+EXPOSE 80
 
 COPY docker-main.sh /app/docker-main.sh
 RUN chmod +x /app/docker-main.sh
