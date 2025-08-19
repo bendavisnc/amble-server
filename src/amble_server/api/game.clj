@@ -3,9 +3,11 @@
    [amble-server.resource.game :as game-resource]
    [amble-server.resource.player :as player-resource]
    [amble-server.utils :as utils]
+   [clojure.data.json :as json]
+   [ring.util.request :as request-util]
    [ring.util.response :as response-util])
   (:import
-   (org.apache.logging.log4j LogManager Logger)))
+   (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.api.game"))
 
@@ -15,13 +17,16 @@
    Currently automatically creates six players."
   [req]
   (try
-    (let [game-id-prefix ((:headers req)
-                          (name :x-amble-game-id-prefix))
-          _ (when game-id-prefix
-              (.info log (str "Using game id prefix value, \""
-                              game-id-prefix
-                              "\".")))
-          game-id (keyword (str game-id-prefix (utils/momentary-game-name)))
+    (let [game-id-str (request-util/body-string req)
+          game-id-map (when (seq game-id-str)
+                        (json/read-str game-id-str :key-fn keyword))
+          game-id (some-> game-id-map :game-id keyword)
+          game-id (if game-id
+                    (do (.info log (format "Using `game-id` provided from client, `%s`." game-id))
+                        game-id)
+                    (let [game-id-provisioned (keyword (utils/momentary-game-name))]
+                      (.info log (format "Providing `game-id` to client, `%s`." game-id-provisioned))
+                      game-id-provisioned))
           already-existing-game-id (game-resource/get game-id)]
       (if (not (nil? already-existing-game-id))
         (-> (response-util/response "Conflict.")
