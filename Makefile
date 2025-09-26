@@ -3,7 +3,7 @@
 POSTGRES ?= false
 
 rundevserver: clean initdb
-	lein run
+	lein trampoline run
 
 initdb:
 ifeq ($(POSTGRES),true)

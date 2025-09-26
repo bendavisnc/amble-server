@@ -33,8 +33,5 @@
                    :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"]
                    :env {:env "dev"
                          :port 3000
-                         :client-url "http://localhost:8080"
-                         :postgres-subname "//localhost:5432/amble"
-                         :postgres-username "admin"
-                         :postgres-password "admin"}}
+                         :client-url "http://localhost:8080"}}
              :uberjar {:aot :all}})
