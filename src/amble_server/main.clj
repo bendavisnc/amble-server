@@ -25,16 +25,33 @@
 
 (defn -main [& _]
   (let [_ (.info log "Setting up amble server.")
-        latest-move-index-chan (async/chan)]
-    (if amble-config/postgres?
-      (.info log (format "Using postgres db, `%s`." amble-config/postgres-subname))
-      (.info log "Using sqlite db."))
+        latest-move-index-chan (async/chan)
+
+        _ (.info log "Starting websockets-ready web server.")
+        server (jetty/run-jetty (maybe-wrap-reload (wrap-with-logger api-handler/handler))
+                                {:port        (Integer/parseInt amble-config/port)
+                                 :daemon?     false
+                                 :join?       false
+                                 :websockets  {move-async/websockets-path
+                                               move-async/handlers}})]
+
     (move-trigger/init! (fn [latest-move-index]
                           (async/put! latest-move-index-chan latest-move-index)))
     (move-async/init! latest-move-index-chan)
-    (.info log "Starting websockets-ready web server.")
-    (jetty/run-jetty (maybe-wrap-reload (wrap-with-logger api-handler/handler))
-                     {:port        (Integer/parseInt amble-config/port)
-                      :daemon?     true
-                      :websockets  {move-async/websockets-path
-                                    move-async/handlers}})))
+
+    (.addShutdownHook (Runtime/getRuntime)
+      (new Thread
+        (fn []
+          (try
+            (.info log "Shutting down amble server.")
+            (.stop server)
+            (.info log "Amble server shutdown successful.")
+            (catch Throwable e
+              (.error log "An error occurred during shutdown.")
+              (.error log e))))))
+
+    (.info log (format "Amble server started on port %s..." amble-config/port))
+    (if amble-config/postgres?
+      (.info log (format "Using postgres db, `%s`." amble-config/postgres-subname))
+      (.info log "Using sqlite db."))
+    (.join server)))

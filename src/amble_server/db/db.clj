@@ -11,12 +11,13 @@
    :foreign_keys "on"})
 
 (def postgres-db
-  {:classname   "org.postgresql.Driver"
-   :subprotocol "postgresql"
-   :subname     (or amble-config/postgres-subname
-                    (throw (new Exception "`postgres-subname` not set in environment variables.")))
-   :user        amble-config/postgres-username
-   :password    amble-config/postgres-password})
+  (when amble-config/postgres?
+    {:classname   "org.postgresql.Driver"
+     :subprotocol "postgresql"
+     :subname     (or amble-config/postgres-subname
+                      (throw (new Exception "`postgres-subname` not set in environment variables.")))
+     :user        amble-config/postgres-username
+     :password    amble-config/postgres-password}))
 
 (def db
   (if amble-config/postgres?
