@@ -2,7 +2,7 @@
   (:require
    [amble-server.config :as amble-config]))
 
-(def sqlite-db-path "../.amble-db/amble.db")
+(def sqlite-db-path amble-config/sqlite-db)
 
 (def sqlite-db
   {:classname   "org.sqlite.JDBC"

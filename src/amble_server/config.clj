@@ -7,6 +7,7 @@
 
 (defenv client-url :client-url)
 (defenv port :port)
+(defenv sqlite-db :sqlite-db)
 (defenv postgres-subname :postgres-subname)
 (defenv postgres-username :postgres-username)
 (defenv postgres-password :postgres-password)

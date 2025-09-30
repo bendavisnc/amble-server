@@ -1,28 +1,29 @@
-FROM clojure:openjdk-17-lein AS build
+FROM clojure:temurin-21-tools-deps AS build
 
 ARG PORT 
 ARG CLIENT_URL 
-ARG POSTGRES_SUBNAME
-ARG POSTGRES_USERNAME 
-ARG POSTGRES_PASSWORD
+ARG SQLITE_DB
 
 WORKDIR /app
 
-COPY project.clj .
+COPY deps.edn .
+COPY build.clj .
 COPY src src
 COPY resources resources
-COPY migrations/initfreshdb.pg.sql migrations/initfreshdb.pg.sql
+COPY migrations/initfreshdb.sql migrations/initfreshdb.sql
 
-RUN lein uberjar
+RUN clj -T:build uber
 
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
+
+# Install sqlite3
+RUN apt-get update && apt-get install -y --no-install-recommends sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/target/*-standalone.jar app.jar
 COPY --from=build /app/migrations migrations
-
-RUN apt-get update && apt-get install -y postgresql-client && apt-get clean
 
 EXPOSE 80
 

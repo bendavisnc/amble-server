@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-echo "Testing DB connection..."
-PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USERNAME" -d "$DATABASE" -c '\l'
-
 echo "Running migration..."
-PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USERNAME" -d "$DATABASE" -f ./migrations/initfreshdb.pg.sql
+echo 'Initializing amble SQLite database'
+
+mkdir -p amble-db
+sqlite3 amble-db/amble.db < migrations/initfreshdb.sql
 
 echo "Starting app..."
-exec java -jar app.jar
+exec java -jar /app/app.jar

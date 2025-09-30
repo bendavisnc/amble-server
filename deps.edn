@@ -17,11 +17,17 @@
         environ {:mvn/version "1.2.0"}
         org.xerial/sqlite-jdbc {:mvn/version "3.36.0.3"}}
 
- ;; aliases for extra stuff
  :aliases
  {:dev
    {:jvm-opts ["-Dport=3000"
                "-Dclient-url=http://localhost:8080"]}
 
   :run
-   {:main-opts ["-m" "amble-server.main"]}}}
+   {:main-opts ["-m" "amble-server.main"]}
+
+
+  :build
+  {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}
+   :ns-default build}}}
+
+
