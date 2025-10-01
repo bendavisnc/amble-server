@@ -1,20 +1,28 @@
 (ns build
   (:require [clojure.tools.build.api :as b]))
 
-(def lib 'amble-server/amble-server)
-(def version "0.0.0")
+(def server-basis (b/create-basis {:project "deps.edn"}))
 (def class-dir "target/classes")
-(def basis (b/create-basis {:project "deps.edn"}))
-(def uber-file (format "target/%s-%s-standalone.jar" (name lib) version))
 
-(defn clean [_]
-  (b/delete {:path "target"}))
+(def server-jar "target/server.jar")
+(def shutdown-jar "target/shutdown.jar")
 
-(defn uber [_]
-  (clean nil)
-  (b/copy-dir {:src-dirs ["src", "resources"] :target-dir class-dir})
-  (b/compile-clj {:basis basis :class-dir class-dir})
+
+(def shutdownapp-basis (b/create-basis {:project "deps.edn"
+                                        :aliases [:shutdownapp]}))
+
+(defn server-uber [_]
+  (b/copy-dir {:src-dirs ["src" "resources"] :target-dir class-dir})
+  (b/compile-clj {:basis server-basis :class-dir class-dir})
   (b/uber {:class-dir class-dir
-           :uber-file uber-file
-           :basis basis
+           :uber-file server-jar
+           :basis server-basis
            :main 'amble-server.main}))
+
+(defn shutdown-uber [_]
+  (b/copy-dir {:src-dirs ["src_amble_shutdown"] :target-dir class-dir})
+  (b/compile-clj {:basis shutdownapp-basis :class-dir class-dir})
+  (b/uber {:class-dir class-dir
+           :uber-file shutdown-jar
+           :basis shutdownapp-basis
+           :main 'amble-shutdown.main}))

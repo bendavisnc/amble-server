@@ -39,17 +39,6 @@
                           (async/put! latest-move-index-chan latest-move-index)))
     (move-async/init! latest-move-index-chan)
 
-    (.addShutdownHook (Runtime/getRuntime)
-      (new Thread
-        (fn []
-          (try
-            (.info log "Shutting down amble server.")
-            (.stop server)
-            (.info log "Amble server shutdown successful.")
-            (catch Throwable e
-              (.error log "An error occurred during shutdown.")
-              (.error log e))))))
-
     (.info log (format "Amble server started on port %s..." amble-config/port))
     (if amble-config/postgres?
       (.info log (format "Using postgres db, `%s`." amble-config/postgres-subname))
