@@ -25,6 +25,10 @@
   :run
    {:main-opts ["-m" "amble-server.main"]}
 
+  :nrepl
+   {:extra-deps {nrepl/nrepl {:mvn/version "1.2.0"}
+                 cider/cider-nrepl {:mvn/version "0.49.0"}}
+    :main-opts ["-e" "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
 
   :build
   {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}

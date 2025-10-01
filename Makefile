@@ -3,7 +3,7 @@
 POSTGRES ?= false
 
 rundevserver: clean initdb
-	lein trampoline run
+	clj -M:run:nrepl
 
 initdb:
 ifeq ($(POSTGRES),true)
@@ -28,9 +28,6 @@ test: test--once
 test--watch:
 	echo 'Running amble server tests, on every file change.'; \
 	lein auto test;
-
-rerundevserver:
-	lein run
 
 format:
 	@echo "Formatting clj..."

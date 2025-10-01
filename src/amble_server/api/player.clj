@@ -39,8 +39,11 @@
          [19 21 23 25 32 34 36 44 46 55]
          [75 85 87 96 98 100 107 108 109 110]]
         player-coord-indexes (index-list id-index)
+        board-coords-resource (io/resource "board.json")
+        _ (when-not board-coords-resource
+            (throw (new Exception "Could not find board.json resource.")))
         boord-coords
-        (edn/read-string (slurp (io/resource "board.json")))
+        (edn/read-string (slurp board-coords-resource)) 
         player-coords (vec (map (fn [i]
                                   (nth boord-coords i))
                                 player-coord-indexes))]
