@@ -1,4 +1,5 @@
 {:paths ["src" "resources"]
+
  :deps {org.clojure/clojure {:mvn/version "1.10.0"}
         compojure {:mvn/version "1.6.1"}
         ring/ring-defaults {:mvn/version "0.3.2"}
@@ -19,24 +20,25 @@
 
  :aliases
  {:dev
-   {:jvm-opts ["-Dport=3000"
-               "-Dclient-url=http://localhost:8080"]}
+  {:jvm-opts ["-Dport=3000"
+              "-Dclient-url=http://localhost:8080"]}
 
   :run
-   {:main-opts ["-m" "amble-server.main"]}
+  {:main-opts ["-m" "amble-server.main"]}
 
   :nrepl
-   {:extra-deps {nrepl/nrepl {:mvn/version "1.2.0"}
-                 cider/cider-nrepl {:mvn/version "0.49.0"}}
-    :main-opts ["-e" "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
+  {:extra-deps {nrepl/nrepl {:mvn/version "1.2.0"}
+                cider/cider-nrepl {:mvn/version "0.49.0"}}
+   :main-opts ["-e" "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
 
-  :shutdownapp
-   {:paths ["src_amble_shutdown"]
-    :deps {org.clojure/clojure {:mvn/version "1.10.0"}}
-    :main-opts ["-m" "amble-shutdown.main"]}
+  :dbbackupapp
+  {:paths ["src_dbbackup"]
+   :deps {org.clojure/clojure {:mvn/version "1.10.0"}
+          environ {:mvn/version "1.2.0"}
+          com.github.rnewman/clj-git {:git/url "https://github.com/bendavisnc/clj-git.git"
+                                      :sha "9adf2a7976814be133037d08fc23c4d90aee7150"}}}
+  ;;  :main-opts ["-m" "amble-shutdown.main"]}
 
   :build
   {:deps {io.github.clojure/tools.build {:mvn/version "0.10.10"}}
    :ns-default build}}}
-
-

@@ -5,11 +5,12 @@
 (def class-dir "target/classes")
 
 (def server-jar "target/server.jar")
-(def shutdown-jar "target/shutdown.jar")
+(def dbbackupread-jar "target/dbbackupread.jar")
+(def dbbackupwrite-jar "target/dbbackupwrite.jar")
 
 
-(def shutdownapp-basis (b/create-basis {:project "deps.edn"
-                                        :aliases [:shutdownapp]}))
+(def dbbackup-basis (b/create-basis {:project "deps.edn"
+                                     :aliases [:dbbackupapp]}))
 
 (defn server-uber [_]
   (b/copy-dir {:src-dirs ["src" "resources"] :target-dir class-dir})
@@ -19,10 +20,19 @@
            :basis server-basis
            :main 'amble-server.main}))
 
-(defn shutdown-uber [_]
-  (b/copy-dir {:src-dirs ["src_amble_shutdown"] :target-dir class-dir})
-  (b/compile-clj {:basis shutdownapp-basis :class-dir class-dir})
+(defn dbbackupread-uber [_]
+  (b/copy-dir {:src-dirs ["src_dbbackup"] :target-dir class-dir})
+  (b/compile-clj {:basis dbbackup-basis :class-dir class-dir})
   (b/uber {:class-dir class-dir
-           :uber-file shutdown-jar
-           :basis shutdownapp-basis
-           :main 'amble-shutdown.main}))
+           :uber-file dbbackupread-jar
+           :basis dbbackup-basis
+           :main 'amble-dbbackup.startupread.main}))
+
+
+(defn dbbackupwrite-uber [_]
+  (b/copy-dir {:src-dirs ["src_dbbackup"] :target-dir class-dir})
+  (b/compile-clj {:basis dbbackup-basis :class-dir class-dir})
+  (b/uber {:class-dir class-dir
+           :uber-file dbbackupwrite-jar
+           :basis dbbackup-basis
+           :main 'amble-dbbackup.shutdownwrite.main}))
