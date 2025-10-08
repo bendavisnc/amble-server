@@ -43,7 +43,7 @@
         _ (when-not board-coords-resource
             (throw (new Exception "Could not find board.json resource.")))
         boord-coords
-        (edn/read-string (slurp board-coords-resource)) 
+        (edn/read-string (slurp board-coords-resource))
         player-coords (vec (map (fn [i]
                                   (nth boord-coords i))
                                 player-coord-indexes))]

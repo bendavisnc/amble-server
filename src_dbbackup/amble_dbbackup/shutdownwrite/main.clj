@@ -2,19 +2,21 @@
   (:gen-class) 
   (:require
    [amble-dbbackup.config :as config]
-   [com.twinql.clojure.git :as git]))
+   [clj-jgit.porcelain :as git]))
 
 (defn write []
-  (git/with-repo config/dbbackup
-    (println (git/push config/dbbackup-remote))))
-
+  (let [repo (git/load-repo config/dbbackup)]
+    (git/git-add repo ".")
+    (git/git-commit repo "Backup update")
+    (git/git-push repo "origin" "main")
+    (println "Backup pushed successfully.")))
 
 (defn -main [& _]
   (.addShutdownHook (Runtime/getRuntime)
     (new Thread
       (fn []
         (write)
-        (println "Database backup read successfully."))))
+        (println "Successfully handled shutdown."))))
   (println "Shutdown handler started, waiting for SIGTERM...")
   (let [lock (new Object)]
     (locking lock

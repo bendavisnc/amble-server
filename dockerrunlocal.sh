@@ -1,10 +1,9 @@
 docker build \
-  --no-cache \
   --build-arg PORT=80 \
   --build-arg CLIENT_URL=http://localhost:8080 \
   --build-arg SQLITE_DB=amble-db/amble.db \
   --build-arg DBBACKUP=amble-db \
-  --build-arg DBBACKUP_REMOTE=testremote/amble-db \
+  --build-arg DBBACKUP_REMOTE=/app/testremote/amble-db \
   -t ambleserverdocker .
 
 docker run \

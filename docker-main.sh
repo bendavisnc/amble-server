@@ -2,7 +2,7 @@
 set -e
 
 echo "Cloning db backup..."
-git config --global --add safe.directory /app/testremote/amble-db/.git
+git config --global --add safe.directory /app/testremote/amble-db
 
 java -jar /app/dbbackupread.jar
 

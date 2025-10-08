@@ -35,8 +35,7 @@
   {:paths ["src_dbbackup"]
    :deps {org.clojure/clojure {:mvn/version "1.10.0"}
           environ {:mvn/version "1.2.0"}
-          com.github.rnewman/clj-git {:git/url "https://github.com/bendavisnc/clj-git.git"
-                                      :sha "9adf2a7976814be133037d08fc23c4d90aee7150"}}}
+          clj-jgit/clj-jgit {:mvn/version "1.1.0"}}}
   ;;  :main-opts ["-m" "amble-shutdown.main"]}
 
   :build
