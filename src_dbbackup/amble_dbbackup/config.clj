@@ -7,3 +7,5 @@
 
 (defenv dbbackup :dbbackup)
 (defenv dbbackup-remote :dbbackup-remote)
+(defenv dbbackup-username :dbbackup-username)
+(defenv dbbackup-private-key :dbbackup-private-key)

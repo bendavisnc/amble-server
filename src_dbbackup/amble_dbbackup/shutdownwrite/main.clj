@@ -8,7 +8,8 @@
   (let [repo (git/load-repo config/dbbackup)]
     (git/git-add repo ".")
     (git/git-commit repo "Backup update")
-    (git/git-push repo "origin" "main")
+    (git/with-credentials {:login config/dbbackup-username :pw config/dbbackup-private-key}
+      (git/git-push repo "origin" "main"))
     (println "Backup pushed successfully.")))
 
 (defn -main [& _]
