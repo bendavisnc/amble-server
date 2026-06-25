@@ -21,7 +21,8 @@
  :aliases
  {:dev
   {:jvm-opts ["-Dport=3000"
-              "-Dclient-url=http://localhost:8080"]}
+              "-Dclient-url=http://localhost:8080"
+              "-Dsqlite-db=amble-db/amble.db"]} 
 
   :run
   {:main-opts ["-m" "amble-server.main"]}

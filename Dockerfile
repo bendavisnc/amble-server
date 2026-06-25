@@ -24,6 +24,9 @@ RUN clj -T:build dbbackupwrite-uber
 
 FROM eclipse-temurin:21-jre
 
+ARG SQLITE_DB
+ENV SQLITE_DB=${SQLITE_DB}
+
 WORKDIR /app
 
 # Install sqlite3 & git

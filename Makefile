@@ -3,7 +3,7 @@
 POSTGRES ?= false
 
 rundevserver: clean initdb
-	clj -M:run:nrepl
+	clj -M:dev:run
 
 initdb:
 ifeq ($(POSTGRES),true)
@@ -11,8 +11,8 @@ ifeq ($(POSTGRES),true)
 	PGPASSWORD=admin psql -U admin -d amble -f migrations/initfreshdb.pg.sql
 else
 	@echo 'Initializing amble SQLite database'; \
-	mkdir -p ../.amble-db; \
-	cd ../.amble-db && sqlite3 amble.db < ../amble-server/migrations/initfreshdb.sql
+	mkdir -p amble-db; \
+	cd amble-db && sqlite3 amble.db < ../migrations/initfreshdb.sql
 endif
 
 clean:

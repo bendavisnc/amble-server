@@ -12,15 +12,27 @@
       (git/git-push repo "origin" "main"))
     (println "Backup pushed successfully.")))
 
-(defn -main [& _]
+(defn write-at-shutdown []
   (.addShutdownHook (Runtime/getRuntime)
     (new Thread
       (fn []
-        (write)
-        (println "Successfully handled shutdown."))))
+        (write))))
+        
   (println "Shutdown handler started, waiting for SIGTERM...")
   (let [lock (new Object)]
     (locking lock
       (.wait lock))))
+
+(defn -main [& _]
+  (if-not config/dbbackup-remote 
+    (println "`dbbackup-remote` not set in config, skipping backup write.")
+    ;; else
+    (do (write-at-shutdown)
+        (println "Successfully handled shutdown."))))
+
+
+
+
+
 
 
