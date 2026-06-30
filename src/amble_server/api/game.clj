@@ -22,7 +22,7 @@
                         (json/read-str game-id-str :key-fn keyword))
           game-id (some-> game-id-map :game-id keyword)
           game-id (if game-id
-                    (do (.info log (format "Using `game-id` provided from client, `%s`." game-id))
+                    (do (.info log (format "Using `game-id` provided from client, `%s`." (name game-id)))
                         game-id)
                     (let [game-id-provisioned (keyword (utils/momentary-game-name))]
                       (.info log (format "Providing `game-id` to client, `%s`." game-id-provisioned))

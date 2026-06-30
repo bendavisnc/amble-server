@@ -16,7 +16,7 @@
       (= {game-db/success id} db-result)
       (do
         (.info log "Game created!")
-        (.info log (format "  \"%s\"" id))
+        (.info log (format "  \"%s\"" (name id)))
         (game-db/success db-result))
 
       :default
@@ -38,12 +38,12 @@
       (= {game-db/success nil-result-value} db-result)
       (do
         (.info log "Game not found!")
-        (.info log (format "  \"%s\"" id))
+        (.info log (format "  \"%s\"" (name id)))
         nil-result-value)
       (= {game-db/success id} db-result)
       (do
         (.info log "Game found!")
-        (.info log (format "  \"%s\"" id))
+        (.info log (format "  \"%s\"" (name id)))
         (game-db/success db-result))
       :default
       (do
@@ -61,7 +61,7 @@
       (if (= {game-db/success id}
              db-result)
         (do (.info log "Game deleted.")
-            (.info log (format "  \"%s\"" id))
+            (.info log (format "  \"%s\"" (name id)))
             id)
         ;; else
         (do (.info log "No game deleted.")
