@@ -9,5 +9,6 @@ docker build \
 docker run \
   -e DATABASE=amble \
   -p 3000:80 \
+  -v "$(pwd)/amble-db:/app/amble-db" \
   --add-host=host.docker.internal:host-gateway \
   ambleserverdocker:latest
