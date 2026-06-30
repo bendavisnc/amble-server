@@ -23,9 +23,8 @@
              (json/read-str (:body create-game-response) :key-fn keyword)))))
 
   (testing "get game"
-    (let [get-game-request  (-> (mock-request/request :get
-                                                      (str "/game/"
-                                                           test-game-id)))
+    (let [get-game-request  (mock-request/request :get
+                                                  (str "/game/" test-game-id))
           get-game-response (api-handler/handler get-game-request)]
       (is (= 200
              (:status get-game-response)))
