@@ -2,11 +2,11 @@
   "Provides callback for move table updates based on SQLite update listener.
    This is used to notify subscribers of move updates."
   (:require
-   [amble-server.db.db :as db]
-   [clojure.java.jdbc :as jdbc])
+    [amble-server.db.db :as db]
+    [clojure.java.jdbc :as jdbc])
   (:import
-   (org.apache.logging.log4j LogManager)
-   (org.sqlite SQLiteUpdateListener)))
+    (org.apache.logging.log4j LogManager)
+    (org.sqlite SQLiteUpdateListener)))
 
 ;; based on:
 ;;   https://github.com/xerial/sqlite-jdbc/blob/3d04d7df0c89240add2c92189adb30b6cb7e6ae0/src/test/java/org/sqlite/ListenerTest.java
@@ -15,23 +15,27 @@
 
 (def subscribers (atom []))
 
-(defn on-update [& args]
+(defn on-update
+  [& args]
   (if (empty? @subscribers)
     (.info log "No subscribers to update.")
-    (do (.info log (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
+    (do (.info
+         log
+         (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
         (let [rowid (last args)]
           (doseq [subscriber @subscribers]
             (subscriber rowid))))))
 
 (def listener
-  (reify SQLiteUpdateListener
-    (onUpdate [this, t, database, table, rowId]
-      (on-update t, database, table, rowId))))
+  (reify
+   SQLiteUpdateListener
+     (onUpdate [this t database table rowId]
+       (on-update t database table rowId))))
 
 (defn init!
   "Adds callback to subscribers state and registers the SQLite update listener."
   [callback]
   (jdbc/with-db-transaction [tx db/db]
-    (.addUpdateListener (:connection tx) listener)
-    (swap! subscribers conj callback)
-    nil))
+                            (.addUpdateListener (:connection tx) listener)
+                            (swap! subscribers conj callback)
+                            nil))

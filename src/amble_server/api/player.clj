@@ -1,34 +1,37 @@
 (ns amble-server.api.player
   (:require
-   [amble-server.resource.game :as game-resource]
-   [amble-server.resource.move :as move-resource]
-   [amble-server.resource.player :as player-resource]
-   [amble-server.utils :as utils]
-   [clojure.edn :as edn]
-   [clojure.java.io :as io]
-   [ring.util.response :as response-util])
+    [amble-server.resource.game :as game-resource]
+    [amble-server.resource.move :as move-resource]
+    [amble-server.resource.player :as player-resource]
+    [amble-server.utils :as utils]
+    [clojure.edn :as edn]
+    [clojure.java.io :as io]
+    [ring.util.response :as response-util])
   (:import
-   (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.api.player"))
 
-(defn get-all [req]
-  (let [game-id (keyword (:game-id (:params req)))
+(defn get-all
+  [req]
+  (let [game-id    (keyword (:game-id (:params req)))
         game-found (game-resource/get game-id)]
     (try
       (cond (not game-found)
             (response-util/status req 404)
             :else
             (response-util/response
-              (player-resource/get-all game-id)))
+             (player-resource/get-all game-id)))
       (catch Throwable e
         (.error log "An error occurred during game board get.")
         (.error log e)
         (response-util/status req 500)))))
 
-(defn crude-player-indexes-map [player-id]
+(defn crude-player-indexes-map
+  [player-id]
   (let [ordered
-        [:player-one, :player-two, :player-three, :player-four, :player-five, :player-six]
+        [:player-one :player-two :player-three :player-four :player-five
+         :player-six]
         id-index (.indexOf ordered player-id)
         _ (assert (not (neg-int? id-index)))
         index-list
@@ -49,10 +52,12 @@
                                 player-coord-indexes))]
     player-coords))
 
-(defn merge-positions-and-moves [simple-position-list, moves-existing]
-  (reduce (fn [acc, move]
+(defn merge-positions-and-moves
+  [simple-position-list moves-existing]
+  (reduce (fn [acc move]
             (assoc acc
-                   (Integer/parseInt (:player-piece-index move)) ;; maybe revisit
+                   (Integer/parseInt (:player-piece-index move)) ;; maybe
+                                                                 ;; revisit
                    [(:x move)
                     (:y move)]))
           simple-position-list
@@ -62,9 +67,9 @@
   "Returns either an existing player's current position as a list of two value vectors, or a not found response, or an error response."
   [req]
   (try
-    (let [game-id (keyword (:game-id (:params req)))
-          player-id (keyword (:player-id (:params req)))
-          player-existing (player-resource/get game-id, player-id)
+    (let [game-id         (keyword (:game-id (:params req)))
+          player-id       (keyword (:player-id (:params req)))
+          player-existing (player-resource/get game-id player-id)
           player-simple-position-list (crude-player-indexes-map player-id)]
       (cond
         (nil? player-existing)
@@ -81,11 +86,18 @@
         (let [moves-existing
               (move-resource/get-by-player-id game-id
                                               player-id)]
-          (-> (response-util/response (merge-positions-and-moves player-simple-position-list moves-existing))
+          (-> (response-util/response (merge-positions-and-moves
+                                       player-simple-position-list
+                                       moves-existing))
               (response-util/status 200)))))
 
     (catch Throwable e
-      (.error log "Something bad happened when trying to get a player from the game," "\"" (:game-id (:params req)) "\".")
+      (.error
+       log
+       "Something bad happened when trying to get a player from the game,"
+       "\""
+       (:game-id (:params req))
+       "\".")
       (.error log e)
       (response-util/status req 500))))
 

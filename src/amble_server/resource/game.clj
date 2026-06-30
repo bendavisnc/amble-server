@@ -1,12 +1,13 @@
 (ns amble-server.resource.game
   (:require
-   [amble-server.db.game :as game-db])
+    [amble-server.db.game :as game-db])
   (:import
-   (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager Logger)))
 
 (def log (. LogManager getLogger "amble-server.resource.game"))
 
-(defn create! [id]
+(defn create!
+  [id]
   (let [db-result (game-db/create! id)]
     (cond
       (game-db/failure db-result)
@@ -21,14 +22,16 @@
 
       :default
       (do
-        (.info log "The unexpected occurred while trying to create game."
+        (.info log
+               "The unexpected occurred while trying to create game."
                (.info log (format "  \"%s\"" db-result))
                (throw (new RuntimeException db-result)))))))
 
-(defn get [id]
+(defn get
+  [id]
   (assert (keyword? id)
           (str "Bad id value provided during get, \"" id "\"."))
-  (let [db-result (game-db/find id)
+  (let [db-result        (game-db/find id)
         nil-result-value nil]
     (cond
       (game-db/failure db-result)
@@ -51,7 +54,8 @@
         (.info log (format "  \"%s\"" db-result))
         (throw (new RuntimeException db-result))))))
 
-(defn delete! [id]
+(defn delete!
+  [id]
   (let [db-result (game-db/delete! id)]
     (if (game-db/failure db-result)
       (do (.info log "Game not deleted.")

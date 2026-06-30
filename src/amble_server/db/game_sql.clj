@@ -1,7 +1,7 @@
 (ns amble-server.db.game-sql
   (:require
-   [amble-server.db.db :as db]
-   [yesql.core :as yesql]))
+    [amble-server.db.db :as db]
+    [yesql.core :as yesql]))
 
 (yesql/defquery game-add! "amble_server/db/game.sql" {:connection db/db})
 
@@ -13,7 +13,8 @@
   [id]
   (game-add! {:id id}))
 
-(defn find [id]
+(defn find
+  [id]
   (let [a
         (game-find-by-id {:id id})]
     a))

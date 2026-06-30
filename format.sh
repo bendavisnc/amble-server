@@ -1,0 +1,1 @@
+zprint '{:style [:community :respect-nl :justified], :files {:glob "**{.edn,.clj,.cljc}"}}' --list-formatted-summary-write;

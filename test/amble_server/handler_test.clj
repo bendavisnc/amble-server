@@ -9,9 +9,13 @@
 (deftest test-amble-server-api
   (testing "create game"
     (let [
-          _ (api-handler/handler (mock-request/request :delete (str "/game/" test-game-id)))
+          _ (api-handler/handler
+             (mock-request/request :delete (str "/game/" test-game-id)))
 
-          create-game-request (mock-request/request :post "/game" (json/write-str {:game-id test-game-id}))
+          create-game-request  (mock-request/request :post
+                                                     "/game"
+                                                     (json/write-str
+                                                      {:game-id test-game-id}))
           create-game-response (api-handler/handler create-game-request)]
       (is (= 201
              (:status create-game-response)))
@@ -19,7 +23,9 @@
              (json/read-str (:body create-game-response) :key-fn keyword)))))
 
   (testing "get game"
-    (let [get-game-request (-> (mock-request/request :get (str "/game/" test-game-id)))
+    (let [get-game-request  (-> (mock-request/request :get
+                                                      (str "/game/"
+                                                           test-game-id)))
           get-game-response (api-handler/handler get-game-request)]
       (is (= 200
              (:status get-game-response)))

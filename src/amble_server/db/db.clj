@@ -1,21 +1,25 @@
 (ns amble-server.db.db
   (:require
-   [amble-server.config :as amble-config]))
+    [amble-server.config :as amble-config]))
 
 (def sqlite-db-path amble-config/sqlite-db)
 
 (def sqlite-db
-  {:classname   "org.sqlite.JDBC"
-   :subprotocol "sqlite"
-   :subname     sqlite-db-path
+  {:classname    "org.sqlite.JDBC"
+   :subprotocol  "sqlite"
+   :subname      sqlite-db-path
    :foreign_keys "on"})
 
 (def postgres-db
   (when amble-config/postgres?
     {:classname   "org.postgresql.Driver"
      :subprotocol "postgresql"
-     :subname     (or amble-config/postgres-subname
-                      (throw (new Exception "`postgres-subname` not set in environment variables.")))
+     :subname     (or
+                   amble-config/postgres-subname
+                   (throw
+                    (new
+                     Exception
+                     "`postgres-subname` not set in environment variables.")))
      :user        amble-config/postgres-username
      :password    amble-config/postgres-password}))
 

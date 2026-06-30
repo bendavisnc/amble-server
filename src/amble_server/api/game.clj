@@ -1,13 +1,13 @@
 (ns amble-server.api.game
   (:require
-   [amble-server.resource.game :as game-resource]
-   [amble-server.resource.player :as player-resource]
-   [amble-server.utils :as utils]
-   [clojure.data.json :as json]
-   [ring.util.request :as request-util]
-   [ring.util.response :as response-util])
+    [amble-server.resource.game :as game-resource]
+    [amble-server.resource.player :as player-resource]
+    [amble-server.utils :as utils]
+    [clojure.data.json :as json]
+    [ring.util.request :as request-util]
+    [ring.util.response :as response-util])
   (:import
-   (org.apache.logging.log4j LogManager)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.api.game"))
 
@@ -20,13 +20,22 @@
     (let [game-id-str (request-util/body-string req)
           game-id-map (when (seq game-id-str)
                         (json/read-str game-id-str :key-fn keyword))
-          game-id (some-> game-id-map :game-id keyword)
-          game-id (if game-id
-                    (do (.info log (format "Using `game-id` provided from client, `%s`." (name game-id)))
-                        game-id)
-                    (let [game-id-provisioned (keyword (utils/momentary-game-name))]
-                      (.info log (format "Providing `game-id` to client, `%s`." game-id-provisioned))
-                      game-id-provisioned))
+          game-id     (some-> game-id-map
+                              :game-id
+                              keyword)
+          game-id     (if game-id
+                        (do (.info
+                             log
+                             (format
+                              "Using `game-id` provided from client, `%s`."
+                              (name game-id)))
+                            game-id)
+                        (let [game-id-provisioned (keyword
+                                                   (utils/momentary-game-name))]
+                          (.info log
+                                 (format "Providing `game-id` to client, `%s`."
+                                         game-id-provisioned))
+                          game-id-provisioned))
           already-existing-game-id (game-resource/get game-id)]
       (if (not (nil? already-existing-game-id))
         (-> (response-util/response "Conflict.")
@@ -35,15 +44,19 @@
         (let [was-game-created (game-resource/create! game-id)
               _ (assert (not (nil? was-game-created))
                         "Problem creating game.")
-              players-created (doall (map (fn [i]
-                                            (player-resource/add! game-id
-                                                                  (keyword (str "player-"
-                                                                                (nth ["one", "two", "three", "four", "five", "six"]
-                                                                                     i)))))
-                                          (range 6)))
+              players-created  (doall (map (fn [i]
+                                             (player-resource/add!
+                                              game-id
+                                              (keyword (str "player-"
+                                                            (nth ["one" "two"
+                                                                  "three" "four"
+                                                                  "five" "six"]
+                                                                 i)))))
+                                           (range 6)))
               _ (doall (map (fn [write-result]
-                              (assert (not (nil? write-result))
-                                      "Unexpected db result while adding game."))
+                              (assert
+                               (not (nil? write-result))
+                               "Unexpected db result while adding game."))
                             (conj players-created was-game-created)))]
 
           (-> (response-util/response {:game-id game-id})
@@ -53,14 +66,16 @@
       (.error log e)
       (response-util/status req 500))))
 
-(defn get-game-id [req]
+(defn get-game-id
+  [req]
   (let [game-id-prefix ((:headers req)
                         (name :x-amble-game-id-prefix))
         _ (when game-id-prefix
-            (.info log (str "Using game id prefix value, \""
-                            game-id-prefix
-                            "\".")))
-        game-id (str game-id-prefix (utils/momentary-game-name))]
+            (.info log
+                   (str "Using game id prefix value, \""
+                        game-id-prefix
+                        "\".")))
+        game-id        (str game-id-prefix (utils/momentary-game-name))]
     (try
       (assert (not (empty? game-id))
               "`game-id` is nil.")
@@ -72,7 +87,8 @@
         (.error log e)
         (response-util/status req 500)))))
 
-(defn get [req]
+(defn get
+  [req]
   (try
     (let [game-id (keyword (:game-id (:params req)))]
       (if-let [game-id (game-resource/get game-id)]
@@ -85,9 +101,10 @@
       (.error log e)
       (response-util/status req 500))))
 
-(defn delete! [req]
+(defn delete!
+  [req]
   (try
-    (let [game-id (keyword (:game-id (:params req)))
+    (let [game-id    (keyword (:game-id (:params req)))
           no-game-id ""
           already-existing-game-id (game-resource/get game-id)]
       (cond (not already-existing-game-id)

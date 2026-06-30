@@ -1,8 +1,9 @@
 (ns amble-server.config
   (:require
-   [environ.core :as environ]))
+    [environ.core :as environ]))
 
-(defmacro defenv [name key]
+(defmacro defenv
+  [name key]
   `(def ~name ~(environ/env key)))
 
 (defenv client-url :client-url)
