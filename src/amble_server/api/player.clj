@@ -1,4 +1,5 @@
 (ns amble-server.api.player
+  (:refer-clojure :exclude [get])
   (:require
     [amble-server.resource.game :as game-resource]
     [amble-server.resource.move :as move-resource]

@@ -1,4 +1,5 @@
 (ns amble-server.api.board
+  (:refer-clojure :exclude [get])
   (:require
     [amble-server.resource.game :as game-resource]
     [amble-server.utils :as utils]

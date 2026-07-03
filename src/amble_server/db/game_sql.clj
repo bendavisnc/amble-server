@@ -1,4 +1,5 @@
 (ns amble-server.db.game-sql
+  (:refer-clojure :exclude [find])
   (:require
     [amble-server.db.db :as db]
     [yesql.core :as yesql]))

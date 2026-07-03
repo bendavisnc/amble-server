@@ -31,7 +31,7 @@
          move-second-go (move-resource/get-by-rowid rowid)]
         (if (nil? move-second-go)
           (throw (new Exception
-                      (str "Can't get lastest move with rowid, \""
+                      (str "Can't get latest move with rowid, \""
                            rowid
                            "\" after retry attempt.")))
           move-second-go))

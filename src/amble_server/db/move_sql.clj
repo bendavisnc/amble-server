@@ -1,4 +1,5 @@
 (ns amble-server.db.move-sql
+  (:refer-clojure :exclude [find count])
   (:require
     [amble-server.config :as amble-config]
     [amble-server.db.db :as db]
@@ -119,6 +120,3 @@
 (defn count
   [game-id]
   (move-count {:game_id game-id}))
-
-(comment
-  (find "TheWednesdayGame" "0"))

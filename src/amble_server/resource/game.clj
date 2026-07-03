@@ -1,4 +1,5 @@
 (ns amble-server.resource.game
+  (:refer-clojure :exclude [get])
   (:require
     [amble-server.db.game :as game-db])
   (:import

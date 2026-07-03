@@ -1,0 +1,1 @@
+clj -M:dev:run

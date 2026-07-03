@@ -1,5 +1,6 @@
 (ns amble-server.resource.move
   "Services moves to the api from the db."
+  (:refer-clojure :exclude [get])
   (:require
     [amble-server.db.move :as move-db])
   (:import

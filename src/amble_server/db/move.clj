@@ -1,4 +1,5 @@
 (ns amble-server.db.move
+  (:refer-clojure :exclude [find])
   (:require
     [amble-server.db.move-sql :as move-sql])
   (:import
