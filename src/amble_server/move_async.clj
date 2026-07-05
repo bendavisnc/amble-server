@@ -5,7 +5,8 @@
   (:require
     [amble-server.resource.move :as move-resource]
     [clojure.core.async :as async :refer [go go-loop]]
-    [ring.adapter.jetty9 :as jetty])
+    [ring.adapter.jetty :as jetty]
+    [ring.websocket :as ring-websocket])
   (:import
     (java.lang Exception)
     (org.apache.logging.log4j LogManager Logger)))
@@ -85,7 +86,6 @@
           _ (assert (not (nil? move-latest))
                     (str "move-latest is null, \"" move-latest "\"."))
 
-          _ (.info log move-latest)
           game-id     (keyword (:game-id move-latest))
           _ (assert (not (nil? game-id))
                     (str "game-id is null, \"" game-id "\"."))
@@ -126,21 +126,12 @@
    :subscriber-id
    (.hashCode ws)
    :update-subscriber!
-   (partial jetty/send! ws)})
-
-(defn game-id
-  [ws]
-  (keyword (first (.get (.getParameterMap (.getUpgradeRequest (.getSession ws)))
-                        "game-id"))))
+   (partial ring-websocket/send ws)})
 
 (defn on-connect
-  [ws & args]
+  [ws game-id]
   (.info log "New move async connection!")
-  (if-let [game-id-from-query-param
-           (game-id ws)]
-    (add-subscriber! (subscriber ws game-id-from-query-param))
-    (throw (new Exception
-                "No game id available at start of websockets connection.")))
+  (add-subscriber! (subscriber ws game-id))
   nil)
 
 (defn find-subscriber-by-id
@@ -162,9 +153,17 @@
 (defn on-close
   [ws & args]
   (.info log "Existing async channel to close.")
+  (when-let [error-message (some-> args
+                                   second
+                                   .getMessage)]
+    (let [code (some-> args
+                       first)]
+      (.error log
+              (format "Error occurred at websocket close, `%s`"
+                      [code error-message]))))
   (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
     (remove-subscriber! subscriber-to-remove)
-    (.debug log (str "No subscriber found to remove at close.")))
+    (.debug log "No subscriber found to remove at close."))
   nil)
 
 (defn on-error
@@ -172,15 +171,31 @@
   (.error log (str "Encountered new async error. \n" (vec args)))
   (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
     (remove-subscriber! subscriber-to-remove)
-    (.debug log (str "No subscriber found to remove at error")))
+    (.debug log "No subscriber found to remove at error"))
   nil)
 
-(def handlers
-  {:on-connect on-connect
-   :on-error   on-error
-   :on-text    nil
-   :on-close   on-close
-   :on-bytes   nil})
+(defn handler
+  [upgrade-request]
+  (let [game-id (keyword (get (:query-params upgrade-request)
+                              "game-id"))
+        _ (when (nil? game-id)
+            (.error log "No `game-id` found from websocket request."))
+        provided-subprotocols (:websocket-subprotocols upgrade-request)
+        provided-extensions (:websocket-extensions upgrade-request)
+        websocket-listener
+        {:ring.websocket/listener {:on-open    (fn [socket]
+                                                 (on-connect socket game-id)
+                                                 nil)
+                                   :on-message (fn [socket message]
+                                                 nil)
+                                   :on-close   on-close
+                                   :on-pong    (fn [socket data]
+                                                 nil)
+                                   :on-ping    (fn [socket data]
+                                                 nil)
+                                   :on-error   on-error}
+         :ring.websocket/protocol (first provided-subprotocols)}]
+    websocket-listener))
 
 ;; Reads from the input chan and notifies subscribers.
 (go-loop []

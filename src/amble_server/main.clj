@@ -3,12 +3,13 @@
   (:require
     [amble-server.api.handler :as api-handler]
     [amble-server.config :as amble-config]
-    [amble-server.db.db :as db]
     [amble-server.db.move-trigger.move-trigger :as move-trigger]
     [amble-server.move-async :as move-async]
     [clojure.core.async :as async]
+    [ring.websocket :as ring-websocket]
     [ring-debug-logging.core :refer [wrap-with-logger]]
-    [ring.adapter.jetty9 :as jetty])
+    [ring.middleware.params :as ring-middleware-params]
+    [ring.adapter.jetty :as jetty])
   (:import
     (org.apache.logging.log4j LogManager))
   (:gen-class))
@@ -24,19 +25,31 @@
         (wrap-reload handler)))
     handler))
 
+(def http-handler
+  (-> api-handler/handler
+      wrap-with-logger
+      maybe-wrap-reload))
+
+(defn handler
+  [req]
+  (if (ring-websocket/upgrade-request? req)
+    ((ring-middleware-params/wrap-params move-async/handler) req)
+    (http-handler req)))
+
 (defn -main
   [& _]
   (let [_ (.info log "Setting up amble server.")
         latest-move-index-chan (async/chan)
-
         _ (.info log "Starting websockets-ready web server.")
         server (jetty/run-jetty
-                (maybe-wrap-reload (wrap-with-logger api-handler/handler))
-                {:port       (Integer/parseInt amble-config/port)
-                 :daemon?    false
-                 :join?      false
-                 :websockets {move-async/websockets-path
-                              move-async/handlers}})]
+                handler
+                {:port            (Integer/parseInt amble-config/port)
+                 :daemon?         false
+                 :join?           false
+                 :ws-idle-timeout 300000 ;; todo, investigate best value
+                                         ;; and error handling when timeout
+                                         ;; exceptions happen
+                })]
 
     (move-trigger/init! (fn [latest-move-index]
                           (async/put! latest-move-index-chan
