@@ -1,4 +1,5 @@
 (ns amble-dbbackup.startupread.main
+  (:refer-clojure :exclude [read])
   (:require
     [amble-dbbackup.config :as config]
     [clj-jgit.porcelain :as git])

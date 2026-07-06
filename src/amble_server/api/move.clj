@@ -5,10 +5,9 @@
     [amble-server.resource.move :as move-resource]
     [clojure.data.json :as json]
     [ring.util.request :as request-util]
-    ;; [amble-server.async-resource.move :as async-resource-move]
     [ring.util.response :as response-util])
   (:import
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.api.move"))
 

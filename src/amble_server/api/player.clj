@@ -4,12 +4,11 @@
     [amble-server.resource.game :as game-resource]
     [amble-server.resource.move :as move-resource]
     [amble-server.resource.player :as player-resource]
-    [amble-server.utils :as utils]
     [clojure.edn :as edn]
     [clojure.java.io :as io]
     [ring.util.response :as response-util])
   (:import
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.api.player"))
 
@@ -83,7 +82,7 @@
             (-> (response-util/response (crude-player-indexes-map player-id))
                 (response-util/status 200)))
 
-        true
+        :else
         (let [moves-existing
               (move-resource/get-by-player-id game-id
                                               player-id)]

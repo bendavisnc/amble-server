@@ -4,10 +4,13 @@
     [amble-server.db.db :as db]
     [yesql.core :as yesql]))
 
+#_:clj-kondo/ignore
 (yesql/defquery game-add! "amble_server/db/game.sql" {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery game-find-by-id "amble_server/db/game.sql" {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery game-delete! "amble_server/db/game.sql" {:connection db/db})
 
 (defn create!
@@ -16,9 +19,7 @@
 
 (defn find
   [id]
-  (let [a
-        (game-find-by-id {:id id})]
-    a))
+  (game-find-by-id {:id id}))
 
 (defn delete!
   [id]

@@ -4,7 +4,7 @@
     [amble-server.db.game :as game-db]
     [amble-server.db.player :as player-db])
   (:import
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.resource.player"))
 

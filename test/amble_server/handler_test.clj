@@ -1,7 +1,7 @@
 (ns amble-server.handler-test
   (:require [amble-server.api.handler :as api-handler]
             [clojure.data.json :as json]
-            [clojure.test :refer :all]
+            [clojure.test :refer [deftest is testing]]
             [ring.mock.request :as mock-request]))
 
 (def test-game-id "TheTestGame")

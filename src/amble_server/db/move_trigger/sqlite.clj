@@ -29,7 +29,7 @@
 (def listener
   (reify
    SQLiteUpdateListener
-     (onUpdate [this t database table rowId]
+     (onUpdate [_ t database table rowId]
        (on-update t database table rowId))))
 
 (defn init!

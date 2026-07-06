@@ -4,7 +4,7 @@
   (:require
     [amble-server.db.move :as move-db])
   (:import
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.resource.move"))
 

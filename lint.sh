@@ -1,0 +1,1 @@
+find . -iname '*.clj' | entr sh -c 'clear; echo "Running clj-kondo..."; clj-kondo --lint .'

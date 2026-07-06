@@ -4,16 +4,13 @@
    and handle connection events."
   (:require
     [amble-server.resource.move :as move-resource]
-    [clojure.core.async :as async :refer [go go-loop]]
-    [ring.adapter.jetty :as jetty]
+    [clojure.core.async :as async :refer [go-loop]]
     [ring.websocket :as ring-websocket])
   (:import
     (java.lang Exception)
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.move-async"))
-
-(def websockets-path "/move/async")
 
 (def subscribers (atom {}))
 
@@ -181,19 +178,12 @@
         _ (when (nil? game-id)
             (.error log "No `game-id` found from websocket request."))
         provided-subprotocols (:websocket-subprotocols upgrade-request)
-        provided-extensions (:websocket-extensions upgrade-request)
         websocket-listener
-        {:ring.websocket/listener {:on-open    (fn [socket]
-                                                 (on-connect socket game-id)
-                                                 nil)
-                                   :on-message (fn [socket message]
-                                                 nil)
-                                   :on-close   on-close
-                                   :on-pong    (fn [socket data]
-                                                 nil)
-                                   :on-ping    (fn [socket data]
-                                                 nil)
-                                   :on-error   on-error}
+        {:ring.websocket/listener {:on-open  (fn [socket]
+                                               (on-connect socket game-id)
+                                               nil)
+                                   :on-close on-close
+                                   :on-error on-error}
          :ring.websocket/protocol (first provided-subprotocols)}]
     websocket-listener))
 

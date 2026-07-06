@@ -7,7 +7,7 @@
     [clojure.java.jdbc :as jdbc])
   (:import
     (org.apache.logging.log4j LogManager)
-    (org.postgresql PGConnection PGNotification)))
+    (org.postgresql PGNotification)))
 
 (def log (. LogManager getLogger "amble-server.move-trigger-postgres"))
 

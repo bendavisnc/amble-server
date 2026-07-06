@@ -5,7 +5,7 @@
     [amble-server.api.move :as move-api]
     [amble-server.api.player :as player-api]
     [amble-server.config :as amble-config]
-    [compojure.core :refer :all]
+    [compojure.core :refer [DELETE GET OPTIONS POST defroutes]]
     [compojure.route :as route]
     [ring.middleware.cors :refer [wrap-cors]]
     [ring.middleware.defaults :as defaults]

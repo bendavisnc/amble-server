@@ -2,12 +2,11 @@
   (:refer-clojure :exclude [get])
   (:require
     [amble-server.resource.game :as game-resource]
-    [amble-server.utils :as utils]
     [clojure.edn :as edn]
     [clojure.java.io :as io]
     [ring.util.response :as response-util])
   (:import
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.api.board"))
 
@@ -19,8 +18,7 @@
     (try
       (cond (not found)
             (response-util/status req 404)
-            :default
-            ; (response-util/response (slurp (io/resource "board.json")))
+            :else
             (response-util/response
              (edn/read-string (slurp (io/resource "board.json")))))
       (catch Throwable e

@@ -3,7 +3,7 @@
   (:require
     [amble-server.db.game :as game-db])
   (:import
-    (org.apache.logging.log4j LogManager Logger)))
+    (org.apache.logging.log4j LogManager)))
 
 (def log (. LogManager getLogger "amble-server.resource.game"))
 
@@ -21,12 +21,11 @@
         (.info log (format "  \"%s\"" (name id)))
         (game-db/success db-result))
 
-      :default
-      (do
-        (.info log
-               "The unexpected occurred while trying to create game."
-               (.info log (format "  \"%s\"" db-result))
-               (throw (new RuntimeException db-result)))))))
+      :else
+      (.info log
+             "The unexpected occurred while trying to create game."
+             (.info log (format "  \"%s\"" db-result))
+             (throw (new RuntimeException db-result))))))
 
 (defn get
   [id]
@@ -49,7 +48,7 @@
         (.info log "Game found!")
         (.info log (format "  \"%s\"" (name id)))
         (game-db/success db-result))
-      :default
+      :else
       (do
         (.info log "The unexpected occurred while trying to get game.")
         (.info log (format "  \"%s\"" db-result))

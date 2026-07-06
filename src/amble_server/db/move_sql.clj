@@ -14,26 +14,33 @@
 
 (def log (. LogManager getLogger "amble-server.db.move-sql"))
 
+#_:clj-kondo/ignore
 (yesql/defquery move-add! "amble_server/db/move.sql" {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery move-delete-by-id!
                 "amble_server/db/move.sql"
                 {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery move-find-by-id "amble_server/db/move.sql" {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery move-find-by-player-id
                 "amble_server/db/move.sql"
                 {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery move-find-by-rowid
                 "amble_server/db/move.sql"
                 {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery move-find-by-game-id
                 "amble_server/db/move.sql"
                 {:connection db/db})
 
+#_:clj-kondo/ignore
 (yesql/defquery move-count "amble_server/db/move.sql" {:connection db/db})
 
 (defn add!
@@ -85,26 +92,26 @@
           (format "`game-id` must be a string, but was %s." (type game-id)))
   (assert (string? id)
           (format "`id` must be a string, but was %s." (type id)))
-  (if-let [move-raw
-           (first (move-find-by-id {:game_id      game-id
-                                    :id           id
-                                    :is_nullified false}))]
+  (when-let [move-raw
+             (first (move-find-by-id {:game_id      game-id
+                                      :id           id
+                                      :is_nullified false}))]
     (move-postfind move-raw)))
 
 (defn find-by-player-id
   [game-id player-id]
-  (if-let [moves-raw
-           (move-find-by-player-id {:game_id      (name game-id)
-                                    :player_id    (name player-id)
-                                    :is_nullified false})]
+  (when-let [moves-raw
+             (move-find-by-player-id {:game_id      (name game-id)
+                                      :player_id    (name player-id)
+                                      :is_nullified false})]
     (map move-postfind
          moves-raw)))
 
 (defn find-by-game-id
   [game-id]
-  (if-let [moves-raw
-           (move-find-by-game-id {:game_id      (name game-id)
-                                  :is_nullified false})]
+  (when-let [moves-raw
+             (move-find-by-game-id {:game_id      (name game-id)
+                                    :is_nullified false})]
     (map :id
          (map move-postfind
               moves-raw))))
@@ -113,8 +120,8 @@
   [rowid]
   (assert (instance? Long rowid)
           (format "Rowid must be a long, but was %s." (type rowid)))
-  (if-let [move-raw
-           (first (move-find-by-rowid {:rowid rowid}))]
+  (when-let [move-raw
+             (first (move-find-by-rowid {:rowid rowid}))]
     (move-postfind move-raw)))
 
 (defn count
