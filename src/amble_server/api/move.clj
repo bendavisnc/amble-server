@@ -5,11 +5,7 @@
     [amble-server.resource.move :as move-resource]
     [clojure.data.json :as json]
     [ring.util.request :as request-util]
-    [ring.util.response :as response-util])
-  (:import
-    (org.apache.logging.log4j LogManager)))
-
-(def log (. LogManager getLogger "amble-server.api.move"))
+    [ring.util.response :as response-util]))
 
 (defn get
   "Returns either an existing move, or a not found response, or an error response."
@@ -23,13 +19,10 @@
         (-> (response-util/response [])
             (response-util/status 404))))
     (catch Throwable e
-      (.error log
-              "Something bad happened when trying to add a move to the game,"
-              "\""
-              (:game-id (:params req))
-              "\".")
-      (.error log e)
-      (response-util/status req 500))))
+      (throw (ex-info
+              "Something bad happened when trying to get a move from the game."
+              {}
+              e)))))
 
 (defn get-all
   [req]
@@ -42,9 +35,11 @@
             (response-util/response
              (move-resource/get-all game-id)))
       (catch Throwable e
-        (.error log "An error occurred during game move get all.")
-        (.error log e)
-        (response-util/status req 500)))))
+        (throw
+         (ex-info
+          "Something bad happened when trying to get all moves from the game."
+          {}
+          e))))))
 
 (defn add!
   "Returns a new move or an error response."
@@ -68,13 +63,11 @@
       (-> (response-util/response move-response-value)
           (response-util/status 201)))
     (catch Throwable e
-      (.error log
-              "Something bad happened when trying to add a move to the game,"
-              "\""
-              (:game-id (:params req))
-              "\".")
-      (.error log e)
-      (response-util/status req 500))))
+      (throw
+       (ex-info
+        "Something bad happened when trying to add a move to the game."
+        {}
+        e)))))
 
 (defn delete!
   "Deletes a move or returns an error response."
@@ -85,11 +78,8 @@
           _ (move-resource/delete! game-id id)]
       (response-util/response nil))
     (catch Throwable e
-      (.error
-       log
-       "Something bad happened when trying to delete a move from the game,"
-       "\""
-       (:game-id (:params req))
-       "\".")
-      (.error log e)
-      (response-util/status req 500))))
+      (throw
+       (ex-info
+        "Something bad happened when trying to delete a move from the game."
+        {}
+        e)))))

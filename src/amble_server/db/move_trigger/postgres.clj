@@ -4,12 +4,10 @@
   (:require
     [amble-server.db.db :as db]
     [clojure.core.async :as core-async]
-    [clojure.java.jdbc :as jdbc])
+    [clojure.java.jdbc :as jdbc]
+    [taoensso.timbre :as log])
   (:import
-    (org.apache.logging.log4j LogManager)
     (org.postgresql PGNotification)))
-
-(def log (. LogManager getLogger "amble-server.move-trigger-postgres"))
 
 (def subscribers (atom []))
 
@@ -27,26 +25,29 @@
            (when-let [notifications (.getNotifications conn)]
              (doseq [^PGNotification notif notifications]
                (let [rowid (Long/parseLong (.getParameter notif))]
-                 (.info log (str "Received notification: " rowid))
+                 (log/info ::start-listener-loop!
+                           (str "Received notification: " rowid))
                  (doseq [callback @subscribers]
                    (try
                      (callback rowid)
                      (catch Exception e
-                       (.warn log "Callback failed" e)))))))
+                       (log/warn ::start-listener-loop!
+                                 "Callback failed"
+                                 e)))))))
            (core-async/<! (core-async/timeout 500)) ; Wait before checking
                                                     ; again
            (recur))))
       (catch Exception e
-        (.error log "Error in notification loop" e)))
+        (log/error ::start-listener-loop! "Error in notification loop" e)))
     (core-async/<! (core-async/timeout 10000)) ; Wait before retrying on
                                                ; failure
-    (.info log "Restarting notification listener...")
+    (log/info ::start-listener-loop! "Restarting notification listener...")
     (recur)))
 
 (defn init!
   "Adds a callback to the notification subscribers list."
   [callback]
-  (.info log "Initializing move trigger listener for PostgreSQL.")
+  (log/info ::init! "Initializing move trigger listener for PostgreSQL.")
   (swap! subscribers conj callback)
   (start-listener-loop!)
   nil)

@@ -8,11 +8,7 @@
     [clojure.java.jdbc :as jdbc]
     [clojure.string :as str]
     [clojure.walk :as walk]
-    [yesql.core :as yesql])
-  (:import
-    (org.apache.logging.log4j LogManager)))
-
-(def log (. LogManager getLogger "amble-server.db.move-sql"))
+    [yesql.core :as yesql]))
 
 #_:clj-kondo/ignore
 (yesql/defquery move-add! "amble_server/db/move.sql" {:connection db/db})

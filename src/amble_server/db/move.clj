@@ -1,11 +1,7 @@
 (ns amble-server.db.move
   (:refer-clojure :exclude [find])
   (:require
-    [amble-server.db.move-sql :as move-sql])
-  (:import
-    (org.apache.logging.log4j LogManager)))
-
-(def log (. LogManager getLogger "amble-server.db.move"))
+    [amble-server.db.move-sql :as move-sql]))
 
 (def success ::success)
 (def failure ::failure)

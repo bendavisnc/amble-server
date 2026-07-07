@@ -6,11 +6,9 @@
     [amble-server.resource.player :as player-resource]
     [clojure.edn :as edn]
     [clojure.java.io :as io]
-    [ring.util.response :as response-util])
-  (:import
-    (org.apache.logging.log4j LogManager)))
+    [ring.util.response :as response-util]
+    [taoensso.timbre :as log]))
 
-(def log (. LogManager getLogger "amble-server.api.player"))
 
 (defn get-all
   [req]
@@ -23,9 +21,12 @@
             (response-util/response
              (player-resource/get-all game-id)))
       (catch Throwable e
-        (.error log "An error occurred during game board get.")
-        (.error log e)
-        (response-util/status req 500)))))
+        (throw (ex-info
+                "An error occurred during game player get all."
+                {:gameid game-id}
+                e))))))
+
+
 
 (defn crude-player-indexes-map
   [player-id]
@@ -73,15 +74,20 @@
           player-simple-position-list (crude-player-indexes-map player-id)]
       (cond
         (nil? player-existing)
-        (do (.info log "No player found for game, \"" game-id "\".")
-            (-> (response-util/response [])
-                (response-util/status 404)))
-
+        (do
+          (log/info ::get
+                    "No player found for game."
+                    {:game-id   game-id
+                     :player-id player-id})
+          (-> (response-util/response [])
+              (response-util/status 404)))
         (empty? player-simple-position-list)
-        (do (.info log "Returning existing player with no moves existing.")
+        (do (log/info ::get
+                      "Returning existing player with no moves existing."
+                      {:game-id   game-id
+                       :player-id player-id})
             (-> (response-util/response (crude-player-indexes-map player-id))
                 (response-util/status 200)))
-
         :else
         (let [moves-existing
               (move-resource/get-by-player-id game-id
@@ -92,14 +98,8 @@
               (response-util/status 200)))))
 
     (catch Throwable e
-      (.error
-       log
-       "Something bad happened when trying to get a player from the game,"
-       "\""
-       (:game-id (:params req))
-       "\".")
-      (.error log e)
-      (response-util/status req 500))))
-
-; (response-util/response
-; (crude-player-indexes-map id)))))
+      (throw
+       (ex-info
+        "Something bad happened when trying to get a player from the game."
+        {} ;; todo
+        e)))))

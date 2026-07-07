@@ -3,24 +3,22 @@
    This is used to notify subscribers of move updates."
   (:require
     [amble-server.db.db :as db]
-    [clojure.java.jdbc :as jdbc])
+    [clojure.java.jdbc :as jdbc]
+    [taoensso.timbre :as log])
   (:import
-    (org.apache.logging.log4j LogManager)
     (org.sqlite SQLiteUpdateListener)))
 
 ;; based on:
 ;;   https://github.com/xerial/sqlite-jdbc/blob/3d04d7df0c89240add2c92189adb30b6cb7e6ae0/src/test/java/org/sqlite/ListenerTest.java
-
-(def log (. LogManager getLogger "amble-server.move-trigger"))
 
 (def subscribers (atom []))
 
 (defn on-update
   [& args]
   (if (empty? @subscribers)
-    (.info log "No subscribers to update.")
-    (do (.info
-         log
+    (log/info ::on-update "No subscribers to update.")
+    (do (log/info
+         ::on-update
          (str "Updating " (count @subscribers) " move trigger subscriber\\s."))
         (let [rowid (last args)]
           (doseq [subscriber @subscribers]

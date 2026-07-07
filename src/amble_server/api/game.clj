@@ -6,11 +6,9 @@
     [amble-server.utils :as utils]
     [clojure.data.json :as json]
     [ring.util.request :as request-util]
-    [ring.util.response :as response-util])
-  (:import
-    (org.apache.logging.log4j LogManager)))
+    [ring.util.response :as response-util]
+    [taoensso.timbre :as log]))
 
-(def log (. LogManager getLogger "amble-server.api.game"))
 
 (defn add!
   "Adds a new game.
@@ -20,22 +18,23 @@
   (try
     (let [game-id-str (request-util/body-string req)
           game-id-map (when (seq game-id-str)
-                        (json/read-str game-id-str :key-fn keyword))
+                        (json/read-str game-id-str :key-fn keyword)) ;; todo
           game-id     (some-> game-id-map
                               :game-id
                               keyword)
           game-id     (if game-id
-                        (do (.info
-                             log
+                        (do (log/info
+                             ::add!
                              (format
                               "Using `game-id` provided from client, `%s`."
                               (name game-id)))
                             game-id)
                         (let [game-id-provisioned (keyword
                                                    (utils/momentary-game-name))]
-                          (.info log
-                                 (format "Providing `game-id` to client, `%s`."
-                                         game-id-provisioned))
+                          (log/info ::add!
+                                    (format
+                                     "Providing `game-id` to client, `%s`."
+                                     (name game-id-provisioned)))
                           game-id-provisioned))
           already-existing-game-id (game-resource/get game-id)]
       (if (not (nil? already-existing-game-id))
@@ -43,7 +42,7 @@
             (response-util/status 409))
         ; else
         (let [was-game-created (game-resource/create! game-id)
-              _ (assert (not (nil? was-game-created))
+              _ (assert (some? was-game-created)
                         "Problem creating game.")
               players-created  (doall (map (fn [i]
                                              (player-resource/add!
@@ -63,30 +62,31 @@
           (-> (response-util/response {:game-id game-id})
               (response-util/status 201)))))
     (catch Throwable e
-      (.error log "An error occurred during game create.")
-      (.error log e)
-      (response-util/status req 500))))
+      (throw (ex-info
+              "An error occurred during game create."
+              {}
+              e)))))
 
 (defn get-game-id
   [req]
   (let [game-id-prefix ((:headers req)
                         (name :x-amble-game-id-prefix))
         _ (when game-id-prefix
-            (.info log
-                   (str "Using game id prefix value, \""
-                        game-id-prefix
-                        "\".")))
+            (log/info ::get-game-id
+                      (str "Using game id prefix value, \""
+                           game-id-prefix
+                           "\".")))
         game-id        (str game-id-prefix (utils/momentary-game-name))]
     (try
       (assert (not (empty? game-id))
               "`game-id` is nil.")
-      (.info log "Providing game id.")
-      (.info log (format "  \"%s\"" game-id))
+      (log/info ::get-game-id (format "Providing game id, `%s`." game-id))
       game-id
       (catch Throwable e
-        (.error log "An error occurred during game get id.")
-        (.error log e)
-        (response-util/status req 500)))))
+        (throw (ex-info
+                "An error occurred during game get id."
+                {}
+                e))))))
 
 (defn get
   [req]
@@ -98,9 +98,10 @@
         (-> (response-util/response {})
             (response-util/status 404))))
     (catch Throwable e
-      (.error log "An error occurred during game get.")
-      (.error log e)
-      (response-util/status req 500))))
+      (throw (ex-info
+              "An error occurred during game get."
+              {}
+              e)))))
 
 (defn delete!
   [req]
@@ -116,6 +117,7 @@
               (-> (response-util/response {:game-id game-id})
                   (response-util/status 200)))))
     (catch Throwable e
-      (.error log "An error occurred during game delete.")
-      (.error log e)
-      (response-util/status req 500))))
+      (throw (ex-info
+              "An error occurred during game delete."
+              {}
+              e)))))
