@@ -37,9 +37,19 @@
              :access-control-allow-methods [:get :post :put :delete :options]
              :access-control-allow-credentials (str true)))
 
+(defn wrap-log-exceptions
+  [handler]
+  (fn [req]
+    (try
+      (handler req)
+      (catch Throwable e
+        (log/error ::wrap-log-exceptions e)
+        (throw e)))))
+
 (def http-handler
   ((comp maybe-wrap-reload
          wrap-cors-for-client
+         wrap-log-exceptions
          #(ring-middleware-json/wrap-json-body % {:keywords? true})
          #(ring-middleware-json/wrap-json-response % {:pretty-print true})
          #(ring-middleware-defaults/wrap-defaults
