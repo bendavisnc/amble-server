@@ -10,7 +10,7 @@
         ring-cors/ring-cors       {:mvn/version "0.1.13"}
         org.clojure/java.jdbc     {:mvn/version "0.7.12"}
         com.taoensso/timbre       {:mvn/version "6.8.0"}
-        org.postgresql/postgresql {:mvn/version "42.7.12"}
+        org.postgresql/postgresql {:mvn/version "42.7.13"}
         ring/ring-mock            {:mvn/version "0.6.2"}
         yesql/yesql               {:mvn/version "0.5.4"}
         environ/environ           {:mvn/version "1.2.0"}
@@ -36,7 +36,7 @@
 
   :nrepl
   {:extra-deps {nrepl/nrepl       {:mvn/version "1.7.0"}
-                cider/cider-nrepl {:mvn/version "0.61.0"}}
+                cider/cider-nrepl {:mvn/version "0.62.0"}}
    :main-opts
    ["-e"
     "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
