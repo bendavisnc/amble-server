@@ -27,8 +27,9 @@
                        {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
          :main-opts   ["-m" "cognitect.test-runner"]
          :exec-fn     cognitect.test-runner.api/test
-         :jvm-opts    ["-Dsqlite-db=amble-db/amble.db"
-                       "-Dclient-url=http://dummyclienturl:8080"]}
+         :jvm-opts    ["-Dport=dummynumber"
+                       "-Dclient-url=http://dummyhost:8080"
+                       "-Dsqlite-db=amble-db/amble.db"]}
 
 
   :run
