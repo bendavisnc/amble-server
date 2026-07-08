@@ -12,19 +12,19 @@
 
 (defn get-all
   [req]
-  (let [game-id    (keyword (:game-id (:params req)))
-        game-found (game-resource/get game-id)]
-    (try
-      (cond (not game-found)
-            (response-util/status req 404)
-            :else
-            (response-util/response
-             (player-resource/get-all game-id)))
-      (catch Throwable e
-        (throw (ex-info
-                "An error occurred during game player get all."
-                {:gameid game-id}
-                e))))))
+  (let [game-id (some-> req
+                        :params
+                        :game-id
+                        keyword)]
+    (try (let [game-found (game-resource/get game-id)]
+           (cond (not game-found) (response-util/status req 404)
+                 :else            (response-util/response
+                                   (player-resource/get-all game-id))))
+         (catch Throwable e
+           (throw (ex-info
+                   "An error occurred during game player get all."
+                   {:game-id game-id}
+                   e))))))
 
 
 
@@ -67,39 +67,48 @@
 (defn get
   "Returns either an existing player's current position as a list of two value vectors, or a not found response, or an error response."
   [req]
-  (try
-    (let [game-id         (keyword (:game-id (:params req)))
-          player-id       (keyword (:player-id (:params req)))
-          player-existing (player-resource/get game-id player-id)
-          player-simple-position-list (crude-player-indexes-map player-id)]
-      (cond
-        (nil? player-existing)
-        (do
-          (log/info ::get
-                    "No player found for game."
-                    {:game-id   game-id
-                     :player-id player-id})
-          (-> (response-util/response [])
-              (response-util/status 404)))
-        (empty? player-simple-position-list)
-        (do (log/info ::get
-                      "Returning existing player with no moves existing."
-                      {:game-id   game-id
-                       :player-id player-id})
-            (-> (response-util/response (crude-player-indexes-map player-id))
-                (response-util/status 200)))
-        :else
-        (let [moves-existing
-              (move-resource/get-by-player-id game-id
-                                              player-id)]
-          (-> (response-util/response (merge-positions-and-moves
-                                       player-simple-position-list
-                                       moves-existing))
-              (response-util/status 200)))))
+  (let [game-id   (some-> req
+                          :params
+                          :game-id
+                          keyword)
+        player-id (some-> req
+                          :params
+                          :player-id
+                          keyword)]
+    (try (let [
 
-    (catch Throwable e
-      (throw
-       (ex-info
-        "Something bad happened when trying to get a player from the game."
-        {} ;; todo
-        e)))))
+               player-existing (player-resource/get game-id player-id)
+               player-simple-position-list (crude-player-indexes-map player-id)]
+           (cond
+             (nil? player-existing)
+             (do
+               (log/info ::get
+                         "No player found for game."
+                         {:game-id   game-id
+                          :player-id player-id})
+               (-> (response-util/response [])
+                   (response-util/status 404)))
+             (empty? player-simple-position-list)
+             (do (log/info ::get
+                           "Returning existing player with no moves existing."
+                           {:game-id   game-id
+                            :player-id player-id})
+                 (-> (response-util/response (crude-player-indexes-map
+                                              player-id))
+                     (response-util/status 200)))
+             :else
+             (let [moves-existing
+                   (move-resource/get-by-player-id game-id
+                                                   player-id)]
+               (-> (response-util/response (merge-positions-and-moves
+                                            player-simple-position-list
+                                            moves-existing))
+                   (response-util/status 200)))))
+
+         (catch Throwable e
+           (throw
+            (ex-info
+             "Something bad happened when trying to get a player from the game."
+             {:game-id   game-id
+              :player-id player-id}
+             e))))))

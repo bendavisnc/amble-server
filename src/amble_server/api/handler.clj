@@ -4,24 +4,8 @@
     [amble-server.api.game :as game-api]
     [amble-server.api.move :as move-api]
     [amble-server.api.player :as player-api]
-    [amble-server.config :as amble-config]
     [compojure.core :refer [DELETE GET OPTIONS POST defroutes]]
-    [compojure.route :as route]
-    [ring.middleware.cors :refer [wrap-cors]]
-    [ring.middleware.defaults :as defaults]
-    [ring.middleware.json :as middleware-json]))
-
-(defn- wrap-cors-for-client
-  [handler]
-  (wrap-cors handler
-             :access-control-allow-origin
-             [(re-pattern
-               (or amble-config/client-url
-                   (throw (new
-                           Exception
-                           "`client-url` not set in environment variables."))))]
-             :access-control-allow-methods [:get :post :put :delete :options]
-             :access-control-allow-credentials (str true)))
+    [compojure.route :as route]))
 
 (defroutes app-routes
            (OPTIONS "*" [] "")
@@ -43,10 +27,4 @@
            (DELETE "/game/:game-id/move/:id" [] move-api/delete!)
            (route/not-found "Not Found"))
 
-(def handler
-  (-> app-routes
-      (defaults/wrap-defaults (assoc-in defaults/api-defaults
-                               [:responses :content-types]
-                               false))
-      wrap-cors-for-client
-      (middleware-json/wrap-json-response {:pretty-print true})))
+(def handler app-routes)

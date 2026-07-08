@@ -5,15 +5,18 @@
     [amble-server.config :as amble-config]
     [amble-server.db.move-trigger.move-trigger :as move-trigger]
     [amble-server.move-async :as move-async]
+    [ring.middleware.cors :refer [wrap-cors]]
+    [ring.middleware.defaults :as ring-middleware-defaults]
+    [ring.middleware.json :as ring-middleware-json]
     [clojure.core.async :as async]
-    [ring.adapter.jetty :as jetty]
     #_[ring-debug-logging.core :refer [wrap-with-logger]]
     [ring.middleware.params :as ring-middleware-params]
+    [ring.adapter.jetty :as jetty]
     [ring.websocket :as ring-websocket]
     [taoensso.timbre :as log])
   (:gen-class))
 
-(defn maybe-wrap-reload
+(defn- maybe-wrap-reload
   [handler]
   (if amble-config/devmode?
     (do
@@ -22,15 +25,36 @@
         (wrap-reload handler)))
     handler))
 
+(defn- wrap-cors-for-client
+  [handler]
+  (wrap-cors handler
+             :access-control-allow-origin
+             [(re-pattern
+               (or amble-config/client-url
+                   (throw (new
+                           Exception
+                           "`client-url` not set in environment variables."))))]
+             :access-control-allow-methods [:get :post :put :delete :options]
+             :access-control-allow-credentials (str true)))
+
 (def http-handler
-  (-> api-handler/handler
-      ;; wrap-with-logger
-      maybe-wrap-reload))
+  ((comp maybe-wrap-reload
+         wrap-cors-for-client
+         #(ring-middleware-json/wrap-json-body % {:keywords? true})
+         #(ring-middleware-json/wrap-json-response % {:pretty-print true})
+         #(ring-middleware-defaults/wrap-defaults
+           %
+           (assoc-in ring-middleware-defaults/api-defaults
+            [:responses :content-types]
+            false)))
+   api-handler/handler))
+
+(def websockets-handler (ring-middleware-params/wrap-params move-async/handler))
 
 (defn handler
   [req]
   (if (ring-websocket/upgrade-request? req)
-    ((ring-middleware-params/wrap-params move-async/handler) req)
+    (websockets-handler req)
     (http-handler req)))
 
 (defn -main
