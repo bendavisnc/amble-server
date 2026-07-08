@@ -4,8 +4,6 @@
     [amble-server.resource.game :as game-resource]
     [amble-server.resource.player :as player-resource]
     [amble-server.utils :as utils]
-    [clojure.data.json :as json]
-    [ring.util.request :as request-util]
     [ring.util.response :as response-util]
     [taoensso.timbre :as log]))
 
@@ -18,7 +16,7 @@
   (let [game-id-from-client (some-> req
                                     :body
                                     :game-id
-                                    :keyword)]
+                                    keyword)]
     (try
       (let [game-id (if game-id-from-client
                       (do (log/info ::add!
@@ -33,8 +31,7 @@
                         game-id-provisioned))
             already-existing-game-id (game-resource/get game-id)]
         (if (not (nil? already-existing-game-id))
-          (->
-            (response-util/status 409))
+          (response-util/status 409)
           ; else
           (let [was-game-created (game-resource/create! game-id)
                 _ (assert (some? was-game-created)

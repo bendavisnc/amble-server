@@ -3,8 +3,6 @@
   (:require
     [amble-server.resource.game :as game-resource]
     [amble-server.resource.move :as move-resource]
-    [clojure.data.json :as json]
-    [ring.util.request :as request-util]
     [ring.util.response :as response-util]))
 
 (defn get
@@ -48,10 +46,7 @@
     (let [game-id (:game-id (:params req))
           player-id (:player-id (:params req))
           player-piece-index (:player-piece-index (:params req))
-          {:keys [move x y client-id]} (json/read-str (request-util/body-string
-                                                       req)
-                                                      :key-fn
-                                                      keyword)
+          {:keys [move x y client-id]} (:body req)
           add (move-resource/add! game-id
                                   player-id
                                   player-piece-index
