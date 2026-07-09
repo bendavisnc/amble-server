@@ -1,4 +1,4 @@
-# amble-server
+# amble-server [![Build Status](https://github.com/bendavisnc/amble-server/actions/workflows/test.yml/badge.svg)](https://github.com/bendavisnc/amble-server/actions/workflows/test.yml)
 
 This is a poc project that's a modest aim to give friends a way to play chinese checkers in almost real time with persistent state based on a relational database.
 
