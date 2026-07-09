@@ -6,15 +6,12 @@
     [amble-server.db.move-trigger.move-trigger :as move-trigger]
     [amble-server.move-async :as move-async]
     [ring.middleware.cors :refer [wrap-cors]]
-    [ring.middleware.defaults :as ring-middleware-defaults]
     [ring.middleware.json :as ring-middleware-json]
     [clojure.core.async :as async]
-    #_[ring-debug-logging.core :refer [wrap-with-logger]]
     [ring.middleware.params :as ring-middleware-params]
     [ring.adapter.jetty :as jetty]
     [ring.websocket :as ring-websocket]
-    [taoensso.timbre :as log])
-  (:gen-class))
+    [taoensso.timbre :as log]))
 
 (defn- maybe-wrap-reload
   [handler]
@@ -51,12 +48,7 @@
          wrap-cors-for-client
          wrap-log-exceptions
          #(ring-middleware-json/wrap-json-body % {:keywords? true})
-         #(ring-middleware-json/wrap-json-response % {:pretty-print true})
-         #(ring-middleware-defaults/wrap-defaults
-           %
-           (assoc-in ring-middleware-defaults/api-defaults
-            [:responses :content-types]
-            false)))
+         #(ring-middleware-json/wrap-json-response % {:pretty-print true}))
    api-handler/handler))
 
 (def websockets-handler (ring-middleware-params/wrap-params move-async/handler))

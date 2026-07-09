@@ -4,11 +4,11 @@
         compojure/compojure       {:mvn/version "1.7.2"}
         ring/ring                 {:mvn/version "1.15.5"}
         ring/ring-json            {:mvn/version "0.5.1"}
-        ring/ring-defaults        {:mvn/version "0.7.1"}
         org.clojure/data.json     {:mvn/version "2.5.2"}
         org.clojure/core.async    {:mvn/version "1.9.865"}
         ring-cors/ring-cors       {:mvn/version "0.1.13"}
         org.clojure/java.jdbc     {:mvn/version "0.7.12"}
+        org.slf4j/slf4j-simple    {:mvn/version "2.0.18"}
         com.taoensso/timbre       {:mvn/version "6.8.0"}
         org.postgresql/postgresql {:mvn/version "42.7.13"}
         ring/ring-mock            {:mvn/version "0.6.2"}
@@ -47,7 +47,7 @@
    :deps  {org.clojure/clojure {:mvn/version "1.12.5"}
            environ/environ     {:mvn/version "1.2.0"}
            clj-jgit/clj-jgit   {:mvn/version "1.1.0"}
-           org.apache.sshd/sshd-common {:mvn/version "3.0.0-M4"}}}
+           org.apache.sshd/sshd-common {:mvn/version "3.0.0-M5"}}}
 
   :build
   {:deps       {io.github.clojure/tools.build {:mvn/version "0.10.14"}}

@@ -31,7 +31,7 @@
                         game-id-provisioned))
             already-existing-game-id (game-resource/get game-id)]
         (if (not (nil? already-existing-game-id))
-          (response-util/status 409)
+          (response-util/status (response-util/response {}) 409)
           ; else
           (let [was-game-created (game-resource/create! game-id)
                 _ (assert (some? was-game-created)

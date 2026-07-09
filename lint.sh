@@ -1,1 +1,1 @@
-find . -iname '*.clj' | entr sh -c 'clear; echo "Running clj-kondo..."; clj-kondo --lint .'
+find src src_dbbackup -iname '*.clj' | entr sh -c 'clear; echo "Running clj-kondo..."; clj-kondo --lint .'
