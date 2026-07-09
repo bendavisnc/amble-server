@@ -1,0 +1,22 @@
+name: Run tests
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Clojure
+        uses: DeLaGuardo/setup-clojure@13
+        with:
+          cli: latest
+
+      - name: Provision sqlite db
+        run: |
+          ./createdb.sh
+
+      - name: Run tests
+        run: |
+          clojure -X:test
