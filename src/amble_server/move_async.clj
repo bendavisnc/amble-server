@@ -68,11 +68,11 @@
                                ;; way to ensure that the db transaction is
                                ;; successful already.
           move-latest (move-latest-with-retry latest-move-index)
-          _ (assert (not (nil? move-latest))
+          _ (assert (some? move-latest)
                     (str "move-latest is null, \"" move-latest "\"."))
 
           game-id     (keyword (:game-id move-latest))
-          _ (assert (not (nil? game-id))
+          _ (assert (some? game-id)
                     (str "game-id is null, \"" game-id "\"."))
           move-game-subscribers (game-id (deref subscribers))]
 

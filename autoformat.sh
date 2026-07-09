@@ -1,1 +1,1 @@
-find . -iname '*.clj' | entr ./format.sh
+find src src_dbbackup -iname '*.clj' | entr ./format.sh

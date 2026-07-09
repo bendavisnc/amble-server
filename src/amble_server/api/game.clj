@@ -30,34 +30,25 @@
                                   {:game-id game-id-provisioned})
                         game-id-provisioned))
             already-existing-game-id (game-resource/get game-id)]
-        (if (not (nil? already-existing-game-id))
+        (if (some? already-existing-game-id)
           (response-util/status (response-util/response {}) 409)
           ; else
           (let [was-game-created (game-resource/create! game-id)
                 _ (assert (some? was-game-created)
                           "Problem creating game.")
-                players-created  (doall (map (fn [i]
-                                               (player-resource/add!
-                                                game-id
-                                                (keyword (str "player-"
-                                                              (nth
-                                                               ["one" "two"
-                                                                "three" "four"
-                                                                "five" "six"]
-                                                               i)))))
-                                             (range 6)))
-                _ (doall (map (fn [write-result]
-                                (assert
-                                 (not (nil? write-result))
-                                 "Unexpected db result while adding game."))
-                              (conj players-created was-game-created)))]
-
+                player-ids       (map (comp keyword (partial str "player-"))
+                                      ["one" "two" "three" "four" "five" "six"])
+                players-created  (for [player-id player-ids]
+                                   (player-resource/add! game-id player-id))
+                _ (doseq [write-result (conj players-created was-game-created)]
+                    (assert (some? write-result)
+                            "Unexpected db result while adding game."))]
             (-> (response-util/response {:game-id game-id})
                 (response-util/status 201)))))
       (catch Throwable e
         (throw (ex-info
                 "An error occurred during game create."
-                {:game-id-from-client :game-id-from-client}
+                {:game-id-from-client game-id-from-client}
                 e))))))
 
 (defn get-game-id
