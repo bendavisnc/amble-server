@@ -57,8 +57,7 @@
   [simple-position-list moves-existing]
   (reduce (fn [acc move]
             (assoc acc
-                   (Integer/parseInt (:player-piece-index move)) ;; maybe
-                                                                 ;; revisit
+                   (:player-piece-index move) ;; maybe revisit
                    [(:x move)
                     (:y move)]))
           simple-position-list
