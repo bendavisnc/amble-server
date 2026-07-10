@@ -46,6 +46,7 @@
   {:paths ["src_dbbackup"]
    :deps  {org.clojure/clojure {:mvn/version "1.12.5"}
            environ/environ     {:mvn/version "1.2.0"}
+           org.slf4j/slf4j-simple    {:mvn/version "2.0.18"}
            clj-jgit/clj-jgit   {:mvn/version "1.1.0"}
            org.apache.sshd/sshd-common {:mvn/version "3.0.0-M5"}}}
 
