@@ -11,7 +11,8 @@
     [ring.middleware.params :as ring-middleware-params]
     [ring.adapter.jetty :as jetty]
     [ring.websocket :as ring-websocket]
-    [taoensso.timbre :as log]))
+    [taoensso.timbre :as log])
+  (:gen-class))
 
 (defn- maybe-wrap-reload
   [handler]
