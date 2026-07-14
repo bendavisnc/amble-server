@@ -16,10 +16,11 @@ if [ ! -f "$SQLITE_DB" ]; then
   echo "File $SQLITE_DB not found. Creating directory and empty file..."
   mkdir -p "$DB_DIR"
   touch "$SQLITE_DB"
+  echo "Running migration..."
+  sqlite3 "$SQLITE_DB" < migrations/initfreshdb.sql
+else
+  echo "Using db from clone backup. No migration run needed."
 fi
-
-echo "Running migration..."
-sqlite3 "$SQLITE_DB" < migrations/initfreshdb.sql
 
 echo "Starting server app..."
 java -jar /app/server.jar &

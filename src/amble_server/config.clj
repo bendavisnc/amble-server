@@ -2,23 +2,17 @@
   (:require
     [environ.core :as environ]))
 
-(def client-url
-  (or (environ/env :client-url)
-      (throw (new Exception "Missing config, `client-url`"))))
+(defmacro defenv
+  [name key]
+  `(def ~name ~(environ/env key)))
 
-(def port
-  (or (environ/env :port)
-      (throw (new Exception "Missing config, `port`"))))
-
-(def sqlite-db (environ/env :sqlite-db))
-
-(def postgres-subname (environ/env :postgres-subname))
-
-(def postgres-username (environ/env :postgres-username))
-
-(def postgres-password (environ/env :postgres-password))
-
-(def dev-env (environ/env :dev-env))
+(defenv client-url :client-url)
+(defenv port :port)
+(defenv sqlite-db :sqlite-db)
+(defenv postgres-subname :postgres-subname)
+(defenv postgres-username :postgres-username)
+(defenv postgres-password :postgres-password)
+(defenv dev-env :env)
 
 ;; Derived values
 (def postgres?

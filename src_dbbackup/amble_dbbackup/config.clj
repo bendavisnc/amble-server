@@ -2,44 +2,11 @@
   (:require
     [environ.core :as environ]))
 
-(def dbbackup
-  (or (environ/env :dbbackup)
-      (throw (new Exception "Missing config, `dbbackup`"))))
+(defmacro defenv
+  [name key]
+  `(def ~name ~(environ/env key)))
 
-
-(def dbbackup-remote
-  (or (environ/env :dbbackup-remote)
-      (throw (new Exception "Missing config, `dbbackup-remote`"))))
-
-
-(def dbbackup-username
-  (or (environ/env :dbbackup-username)
-      (throw (new Exception "Missing config, `dbbackup-username`"))))
-
-
-(def dbbackup-private-key
-  (or (environ/env :dbbackup-private-key)
-      (throw (new Exception "Missing config, `dbbackup-private-key`"))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(defenv dbbackup :dbbackup)
+(defenv dbbackup-remote :dbbackup-remote)
+(defenv dbbackup-username :dbbackup-username)
+(defenv dbbackup-private-key :dbbackup-private-key)

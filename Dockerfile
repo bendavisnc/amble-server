@@ -1,4 +1,4 @@
-FROM clojure:temurin-21-tools-deps AS build
+FROM clojure:temurin-25-tools-deps AS build
 
 ARG PORT 
 ARG CLIENT_URL 
@@ -22,7 +22,7 @@ RUN clj -T:build server-uber
 RUN clj -T:build dbbackupread-uber
 RUN clj -T:build dbbackupwrite-uber
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 
 ARG SQLITE_DB
 ENV SQLITE_DB=${SQLITE_DB}
