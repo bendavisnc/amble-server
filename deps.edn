@@ -37,7 +37,7 @@
 
   :nrepl
   {:extra-deps {nrepl/nrepl       {:mvn/version "1.7.0"}
-                cider/cider-nrepl {:mvn/version "0.62.0"}}
+                cider/cider-nrepl {:mvn/version "0.62.1"}}
    :main-opts
    ["-e"
     "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
