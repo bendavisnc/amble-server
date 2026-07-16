@@ -1,16 +1,15 @@
 #!/bin/bash
 set -e
 
-echo "Cloning db backup..."
-
-java -jar /app/dbbackupread.jar
-
 if [ -z "$SQLITE_DB" ]; then
   echo "Error: SQLITE_DB environment variable is not set."
   exit 1
 fi
 
 DB_DIR=$(dirname "$SQLITE_DB")
+
+echo "Cloning db backup..."
+./scripts/whenserverstarts/gitclone.sh
 
 if [ ! -f "$SQLITE_DB" ]; then
   echo "File $SQLITE_DB not found. Creating directory and empty file..."
@@ -26,12 +25,17 @@ echo "Starting server app..."
 java -jar /app/server.jar &
 SERVER_PID=$!
 
-echo "Starting background db backup write process..."
-java -jar /app/dbbackupwrite.jar &
-DBBACKUPWRITE_PID=$!
-
 # Trap Docker stop
-trap 'echo "Container stopping…"; kill $SERVER_PID $DBBACKUPWRITE_PID; wait' TERM INT
+trap '
+  echo "Container stopping..."
+  echo "Running git push command"
+  cd "$DB_DIR"
+  ../scripts/whenserverstops/gitpush.sh
+  cd -
+  echo "Killing server process"
+  kill "$SERVER_PID"
+  wait
+' TERM INT
 
 # Wait for the server to exit
 wait "$SERVER_PID"

@@ -16,11 +16,9 @@ COPY src src
 COPY src_dbbackup src_dbbackup
 COPY resources resources
 COPY migrations/initfreshdb.sql migrations/initfreshdb.sql
+COPY scripts scripts
 
 RUN clj -T:build server-uber
-
-RUN clj -T:build dbbackupread-uber
-RUN clj -T:build dbbackupwrite-uber
 
 FROM eclipse-temurin:25-jre
 
@@ -35,14 +33,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends sqlite3 git \
 
 COPY --from=build /app/target/server.jar .
 
-COPY --from=build /app/target/dbbackupread.jar .
-COPY --from=build /app/target/dbbackupwrite.jar .
-
 COPY --from=build /app/migrations migrations
+
+COPY --from=build /app/scripts scripts
 
 EXPOSE 80
 
 COPY docker-main.sh /app/docker-main.sh
 RUN chmod +x /app/docker-main.sh
+RUN chmod +x /app/scripts/whenserverstops/gitpush.sh
+RUN chmod +x /app/scripts/whenserverstarts/gitclone.sh
 
 CMD ["/app/docker-main.sh"]
