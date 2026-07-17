@@ -13,17 +13,25 @@ WORKDIR /app
 COPY deps.edn .
 COPY build.clj .
 COPY src src
-COPY src_dbbackup src_dbbackup
 COPY resources resources
 COPY migrations/initfreshdb.sql migrations/initfreshdb.sql
 COPY scripts scripts
 
-RUN clj -T:build server-uber
+RUN clojure -X:deps tree
+RUN clojure -T:build server-uber
 
 FROM eclipse-temurin:25-jre
 
 ARG SQLITE_DB
 ENV SQLITE_DB=${SQLITE_DB}
+ARG DBBACKUP
+ENV DBBACKUP=${DBBACKUP}
+ARG DBBACKUP_REMOTE
+ENV DBBACKUP_REMOTE=${DBBACKUP_REMOTE}
+ARG DBBACKUP_USERNAME
+ENV DBBACKUP_USERNAME=${DBBACKUP_USERNAME}
+ARG DBBACKUP_PRIVATE_KEY
+ENV DBBACKUP_PRIVATE_KEY=${DBBACKUP_PRIVATE_KEY}
 
 WORKDIR /app
 

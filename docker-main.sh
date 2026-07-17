@@ -2,14 +2,19 @@
 set -e
 
 if [ -z "$SQLITE_DB" ]; then
-  echo "Error: SQLITE_DB environment variable is not set."
+  echo "Error: \`SQLITE_DB\` environment variable is not set."
   exit 1
 fi
 
 DB_DIR=$(dirname "$SQLITE_DB")
 
-echo "Cloning db backup..."
-./scripts/whenserverstarts/gitclone.sh
+if [ -z "$DBBACKUP_REMOTE" ]; then
+  echo "\`DBBACKUP_REMOTE\` environment variable is not set."
+  echo "Skipping cloning db backup."
+else
+  echo "Cloning db backup,  \`$DBBACKUP_REMOTE\`..."
+  ./scripts/whenserverstarts/gitclone.sh
+fi
 
 if [ ! -f "$SQLITE_DB" ]; then
   echo "File $SQLITE_DB not found. Creating directory and empty file..."

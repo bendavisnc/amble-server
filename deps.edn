@@ -11,7 +11,6 @@
         org.slf4j/slf4j-simple    {:mvn/version "2.0.18"}
         com.taoensso/timbre       {:mvn/version "6.8.0"}
         org.postgresql/postgresql {:mvn/version "42.7.13"}
-        ring/ring-mock            {:mvn/version "0.6.2"}
         yesql/yesql               {:mvn/version "0.5.4"}
         environ/environ           {:mvn/version "1.2.0"}
         org.xerial/sqlite-jdbc    {:mvn/version "3.53.2.0"}}
@@ -23,8 +22,9 @@
               "-Dsqlite-db=amble-db/amble.db"
               "-Ddev-env=dev"]}
   :test {:extra-paths ["test"]
-         :extra-deps  {io.github.cognitect-labs/test-runner
-                       {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+         :extra-deps  {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1"
+                                                             :git/sha "dfb30dd"}
+                       ring/ring-mock {:mvn/version "0.6.2"}}
          :main-opts   ["-m" "cognitect.test-runner"]
          :exec-fn     cognitect.test-runner.api/test
          :jvm-opts    ["-Dport=dummynumber"
@@ -42,13 +42,6 @@
    ["-e"
     "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
 
-  :dbbackupapp
-  {:paths ["src_dbbackup"]
-   :deps  {org.clojure/clojure {:mvn/version "1.12.5"}
-           environ/environ     {:mvn/version "1.2.0"}
-           org.slf4j/slf4j-simple    {:mvn/version "2.0.18"}
-           clj-jgit/clj-jgit   {:mvn/version "1.1.0"}
-           org.apache.sshd/sshd-common {:mvn/version "3.0.0-M5"}}}
 
   :build
   {:deps       {io.github.clojure/tools.build {:mvn/version "0.10.14"}}

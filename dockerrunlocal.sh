@@ -11,7 +11,6 @@ docker build \
   -t ambleserverdocker .
 
 docker run \
-  -e DATABASE=amble \
   -p 3000:80 \
   -v "$(pwd)/../../amble-db:/app/testremote/amble-db" \
   --add-host=host.docker.internal:host-gateway \
