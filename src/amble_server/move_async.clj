@@ -6,7 +6,9 @@
     [amble-server.resource.move :as move-resource]
     [clojure.core.async :as async :refer [go-loop]]
     [ring.websocket :as ring-websocket]
-    [taoensso.timbre :as log]))
+    [taoensso.timbre :as log])
+  (:import
+    [java.nio.channels ClosedChannelException]))
 
 (def subscribers (atom {}))
 
@@ -24,10 +26,9 @@
          _ (Thread/sleep 250)
          move-second-go (move-resource/get-by-rowid rowid)]
         (if (nil? move-second-go)
-          (throw (new Exception
-                      (str "Can't get latest move with rowid, \""
-                           rowid
-                           "\" after retry attempt.")))
+          (throw (ex-info
+                  "Can't get latest move with rowid after retry attempt."
+                  {:rowid rowid}))
           move-second-go))
       move)))
 
@@ -153,11 +154,14 @@
   nil)
 
 (defn on-error
-  [ws & args]
-  (log/error ::on-error "Encountered new async error." {:args (vec args)})
+  [ws e]
+  (when (instance? ClosedChannelException e)
+    (log/debug ::on-error "Encountered `ClosedChannelException` error."))
   (if-let [subscriber-to-remove (find-subscriber-by-id (.hashCode ws))]
     (remove-subscriber! subscriber-to-remove)
     (log/debug ::on-error "No subscriber found to remove at error"))
+  (when-not (instance? ClosedChannelException e)
+    (throw (ex-info "Encountered unexpected async error." {} e)))
   nil)
 
 (defn handler
