@@ -3,6 +3,7 @@
     [environ.core :as environ]))
 
 (defmacro defenv
+  {:clj-kondo/lint-as 'clojure.core/def}
   [name key]
   `(def ~name ~(environ/env key)))
 
