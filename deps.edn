@@ -16,7 +16,7 @@
         org.postgresql/postgresql {:mvn/version "42.7.13"}
         yesql/yesql               {:mvn/version "0.5.4"}
         environ/environ           {:mvn/version "1.2.0"}
-        org.xerial/sqlite-jdbc    {:mvn/version "3.53.2.0"}}
+        org.xerial/sqlite-jdbc    {:mvn/version "3.53.2.1"}}
 
  :aliases
  {:dev
@@ -40,7 +40,7 @@
 
   :nrepl
   {:extra-deps {nrepl/nrepl       {:mvn/version "1.7.0"}
-                cider/cider-nrepl {:mvn/version "0.62.1"}}
+                cider/cider-nrepl {:mvn/version "0.62.2"}}
    :main-opts
    ["-e"
     "(require 'nrepl.cmdline) (apply nrepl.cmdline/-main [\"--middleware\" \"[cider.nrepl/cider-middleware]\" \"--host\" \"0.0.0.0\" \"--port\" \"7000\"])"]}
