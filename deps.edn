@@ -1,6 +1,9 @@
 {:paths ["src" "resources"]
 
- :deps {org.clojure/clojure       {:mvn/version "1.12.5"}
+ :deps {io.github.bendavisnc/amble-board
+        {:git/sha
+         "aa0d5e050f852266515ee1b695c699f9737a70c3"}
+        org.clojure/clojure       {:mvn/version "1.12.5"}
         compojure/compojure       {:mvn/version "1.7.2"}
         ring/ring                 {:mvn/version "1.15.5"}
         ring/ring-json            {:mvn/version "0.5.1"}
